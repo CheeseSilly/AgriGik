@@ -1,0 +1,1876 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 智能助手 - 现代化版本</title>
+
+    <!-- 引入现代化CSS样式 -->
+    <link rel="stylesheet" href="styles.css" />
+
+    <!-- 引入 Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Tailwind 配置 -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                DEFAULT: "#10b981",
+                dark: "#059669",
+                light: "#34d399",
+              },
+              secondary: {
+                DEFAULT: "#14b8a6",
+                dark: "#0d9488",
+                light: "#2dd4bf",
+              },
+              accent: {
+                DEFAULT: "#06b6d4",
+                dark: "#0891b2",
+                light: "#22d3ee",
+              },
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+
+  <body class="animated-bg transition-colors duration-300">
+    <!-- 主题切换按钮(dark mode) -->
+    <div class="fixed top-4 right-4 z-50">
+      <button
+        id="themeToggle"
+        onclick="toggleTheme()"
+        class="p-3 rounded-full bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/30 transition-all duration-300 shadow-lg"
+        title="切换主题"
+      >
+        <svg
+          id="sunIcon"
+          class="w-5 h-5 text-yellow-400 hidden dark:block"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+        <svg
+          id="moonIcon"
+          class="w-5 h-5 text-slate-400 block dark:hidden"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path
+            d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"
+          ></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- 主要演示内容(skip) -->
+
+    <!-- AI助手浮动按钮 -->
+    <div class="ai-assistant-widget">
+      <!-- 主按钮 -->
+      <button id="aiButton" onclick="toggleMiniChat()" class="btn-floating">
+        <div class="pulse-ring"></div>
+        <div class="floating-content">
+          <img
+            class="floating-icon"
+            src="chat-ui-svgrepo-com.svg"
+            alt="Chat Icon"
+          />
+          <span class="floating-text">问AI</span>
+        </div>
+        <!-- 通知徽章 -->
+        <div id="aiBadge" class="notification-badge hidden">1</div>
+      </button>
+
+      <!-- 迷你聊天窗口 -->
+      <div id="aiMiniChat" class="chat-container">
+        <!-- 头部 -->
+        <div class="chat-header">
+          <div class="chat-title">
+            <svg
+              class="icon text-white"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path d="M9 12l2 2 4-4" />
+              <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3" />
+              <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3" />
+              <path d="M12 3c0 1-1 3-3 3s-3-2-3-3 1-3 3-3 3 2 3 3" />
+              <path d="M12 21c0-1 1-3 3-3s3 2 3 3-1 3-3 3-3-2-3-3" />
+            </svg>
+            AI 助手
+          </div>
+          <div class="chat-actions">
+            <button
+              class="chat-action-btn"
+              onclick="openFullscreen()"
+              title="全屏模式"
+            >
+              <svg
+                class="icon-sm"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"
+                />
+              </svg>
+            </button>
+            <button
+              class="chat-action-btn"
+              onclick="toggleMiniChat()"
+              title="关闭"
+            >
+              <svg
+                class="icon-sm"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- 消息区域 -->
+        <div id="aiMiniMessages" class="chat-messages">
+          <div class="message ai">
+            <div class="message-avatar ai">
+              <img
+                class="icon text-white relative z-10"
+                src="chat-ui-svgrepo-com.svg"
+                alt="Chat Icon"
+              />
+            </div>
+            <div class="message-content">
+              👋 您好！我是谷稷，有什么可以帮助您的吗？
+            </div>
+          </div>
+
+          <!-- 迷你预设问题 -->
+          <div class="mini-example-questions" id="miniExampleQuestions">
+            <div class="mini-questions-header">
+              <span>农业问题咨询</span>
+            </div>
+            <div class="mini-questions-list">
+              <button
+                class="mini-question"
+                onclick="selectMiniExampleQuestion(this)"
+                data-question="我的番茄叶子上出现黄色斑点，可能是什么病害？"
+              >
+                🍅 作物病虫害诊断
+              </button>
+              <button
+                class="mini-question"
+                onclick="selectMiniExampleQuestion(this)"
+                data-question="现在7月份，广东地区适合种植什么蔬菜？"
+              >
+                🌱 种植时间咨询
+              </button>
+              <button
+                class="mini-question"
+                onclick="selectMiniExampleQuestion(this)"
+                data-question="土壤湿度传感器显示数值异常，如何排查问题？"
+              >
+                � 数据异常分析
+              </button>
+              <button
+                class="mini-question"
+                onclick="selectMiniExampleQuestion(this)"
+                data-question="如何制定科学的水肥一体化灌溉方案？"
+              >
+                💧 灌溉施肥指导
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 输入区域 -->
+        <div class="chat-input">
+          <div class="input-container">
+            <input id="aiMiniInput" type="text" placeholder="输入您的问题..." />
+            <button onclick="sendMiniMessage()" class="send-btn">
+              <svg
+                class="icon-sm"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <line x1="22" y1="2" x2="11" y2="13" />
+                <polygon points="22,2 15,22 11,13 2,9 22,2" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 全屏模态框 -->
+    <div id="aiModal" class="fullscreen-modal">
+      <!-- 头部 -->
+      <div class="fullscreen-header">
+        <div class="fullscreen-title">
+          <svg
+            class="icon-lg text-white"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+          >
+            <path d="M9 12l2 2 4-4" />
+            <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3" />
+            <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3" />
+            <path d="M12 3c0 1-1 3-3 3s-3-2-3-3 1-3 3-3 3 2 3 3" />
+            <path d="M12 21c0-1 1-3 3-3s3 2 3 3-1 3-3 3-3-2-3-3" />
+          </svg>
+          AI 智能助手
+        </div>
+        <div class="fullscreen-actions">
+          <button
+            onclick="handleHeaderButtonClick(event, 'toggleSidebar')"
+            class="btn btn-secondary"
+          >
+            <svg
+              class="icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9,22 9,12 15,12 15,22" />
+            </svg>
+            历史记录
+          </button>
+          <button
+            onclick="handleHeaderButtonClick(event, 'exportAllHistory')"
+            class="btn btn-secondary"
+          >
+            <svg
+              class="icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7,10 12,15 17,10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            导出历史
+          </button>
+          <button
+            onclick="handleHeaderButtonClick(event, 'closeFullscreen')"
+            class="btn btn-secondary"
+            type="button"
+          >
+            <svg
+              class="icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+            关闭
+          </button>
+        </div>
+      </div>
+
+      <!-- 主要内容 -->
+      <div class="fullscreen-content">
+        <!-- 侧边栏 -->
+        <div id="aiSidebar" class="sidebar">
+          <div class="sidebar-header">
+            <button onclick="startNewChat()" class="btn btn-primary w-full">
+              <svg
+                class="icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              新建对话
+            </button>
+            <div class="sidebar-menu">
+              <button
+                onclick="clearAllHistory()"
+                class="btn btn-secondary btn-sm w-full mt-2"
+                title="清空所有历史记录"
+              >
+                <svg
+                  class="icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <polyline points="3,6 5,6 21,6"></polyline>
+                  <path
+                    d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"
+                  ></path>
+                </svg>
+                清空历史
+              </button>
+            </div>
+          </div>
+          <div id="aiHistoryList" class="sidebar-content">
+            <!-- 历史记录将在这里显示 -->
+          </div>
+        </div>
+
+        <!-- 主聊天区域 -->
+        <div class="main-chat">
+          <!-- 消息区域 -->
+          <div id="aiFullMessages" class="main-messages">
+            <div class="message ai">
+              <div class="message-avatar ai">
+                <img
+                  class="icon text-white relative z-10"
+                  src="chat-ui-svgrepo-com.svg"
+                  alt="Chat Icon"
+                />
+              </div>
+              <div class="message-content">
+                👋
+                欢迎使用AI智能助手！我可以帮助您解答问题、分析文档、进行创意思考等。请随时向我提问。
+              </div>
+            </div>
+
+            <!-- 预设问题区域 -->
+            <div class="example-questions" id="exampleQuestions">
+              <div class="example-questions-header">
+                <h3>智慧农业助手</h3>
+              </div>
+              <div class="example-questions-grid">
+                <button
+                  class="example-question"
+                  onclick="selectExampleQuestion(this)"
+                  data-question="我的番茄叶片背面出现了很多白色小飞虫，应该如何防治？"
+                >
+                  <div class="question-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
+                      />
+                      <path d="M8 12l2 2 4-4" />
+                    </svg>
+                  </div>
+                  <div class="question-text">
+                    <span class="question-title">病虫害智能诊断</span>
+                    <span class="question-desc"
+                      >识别作物病害，提供防治方案</span
+                    >
+                  </div>
+                </button>
+
+                <button
+                  class="example-question"
+                  onclick="selectExampleQuestion(this)"
+                  data-question="我在广东，现在7月份适合种什么蔬菜？请给出详细的种植建议。"
+                >
+                  <div class="question-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path
+                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"
+                      />
+                      <circle cx="12" cy="12" r="5" />
+                    </svg>
+                  </div>
+                  <div class="question-text">
+                    <span class="question-title">种植决策支持</span>
+                    <span class="question-desc">根据地区和季节推荐作物</span>
+                  </div>
+                </button>
+
+                <button
+                  class="example-question"
+                  onclick="selectExampleQuestion(this)"
+                  data-question="A地块的土壤湿度在过去3小时内下降了50%，可能是什么原因？"
+                >
+                  <div class="question-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M3 3v18h18" />
+                      <path d="m7 16 4-4 4 4 4-4" />
+                    </svg>
+                  </div>
+                  <div class="question-text">
+                    <span class="question-title">数据异常解读</span>
+                    <span class="question-desc">分析传感器数据波动原因</span>
+                  </div>
+                </button>
+
+                <button
+                  class="example-question"
+                  onclick="selectExampleQuestion(this)"
+                  data-question="如何为玉米制定科学的水肥一体化灌溉方案？"
+                >
+                  <div class="question-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path
+                        d="M7 16.3c2.2 0 4-1.8 4-4 0-1.5-.7-2.9-1.9-3.7-.6-.4-1.1-.7-1.1-1.4 0-.4.2-.8.4-1.1C9.1 5.4 10 5 11 5c.6 0 1.2.1 1.8.3"
+                      />
+                      <path d="m11 2-1 2 1 2 1-2-1-2" />
+                      <path d="M19.07 4.93A10 10 0 0 0 12 2" />
+                      <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
+                      <path d="m14 14 1-1 1 1-1 1-1-1" />
+                    </svg>
+                  </div>
+                  <div class="question-text">
+                    <span class="question-title">灌溉施肥指导</span>
+                    <span class="question-desc">制定水肥管理方案</span>
+                  </div>
+                </button>
+
+                <button
+                  class="example-question"
+                  onclick="selectExampleQuestion(this)"
+                  data-question="如何通过智能设备监测大棚内的温湿度和光照条件？"
+                >
+                  <div class="question-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <rect x="2" y="4" width="20" height="16" rx="2" />
+                      <path d="m22 6-10 6L2 6" />
+                    </svg>
+                  </div>
+                  <div class="question-text">
+                    <span class="question-title">智能设备应用</span>
+                    <span class="question-desc">环境监测与自动化控制</span>
+                  </div>
+                </button>
+
+                <button
+                  class="example-question"
+                  onclick="selectExampleQuestion(this)"
+                  data-question="分析我农场的产量数据，给出增产建议和优化方案。"
+                >
+                  <div class="question-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M3 3v18h18" />
+                      <path d="M7 12v4" />
+                      <path d="M12 8v8" />
+                      <path d="M17 4v12" />
+                    </svg>
+                  </div>
+                  <div class="question-text">
+                    <span class="question-title">产量数据分析</span>
+                    <span class="question-desc">数据驱动的增产策略</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 输入区域 -->
+          <div class="main-input-area">
+            <!-- 文件上传区域 -->
+            <div id="aiUploadArea" class="upload-area">
+              <svg
+                class="icon text-gray-500 mx-auto mb-2"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                />
+                <polyline points="14,2 14,8 20,8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+                <polyline points="10,9 9,9 8,9" />
+              </svg>
+              <p class="text-gray-600">点击或拖拽文件到此处上传</p>
+              <p class="text-sm text-gray-500 mt-1">支持多种文件格式</p>
+            </div>
+
+            <input
+              type="file"
+              id="fullFileInput"
+              class="hidden"
+              onchange="handleFullFileUpload(event)"
+              multiple
+            />
+
+            <!-- 已上传文件列表 -->
+            <div id="aiUploadedFiles" class="uploaded-files"></div>
+
+            <!-- 输入框 -->
+            <div class="main-input-container">
+              <textarea
+                id="aiFullInput"
+                placeholder="输入您的问题... (Shift+Enter 换行)"
+                class="main-input"
+                rows="1"
+              ></textarea>
+              <div class="input-actions">
+                <button
+                  onclick="document.getElementById('fullFileInput').click()"
+                  class="input-action-btn"
+                  title="上传文件"
+                >
+                  <svg
+                    class="icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                  >
+                    <path
+                      d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66L9.64 16.2a2 2 0 0 1-2.83-2.83l8.49-8.49"
+                    />
+                  </svg>
+                </button>
+                <button
+                  onclick="sendFullMessage()"
+                  class="input-action-btn primary"
+                  title="发送消息"
+                >
+                  <svg
+                    class="icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                  >
+                    <line x1="22" y1="2" x2="11" y2="13" />
+                    <polygon points="22,2 15,22 11,13 2,9 22,2" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 初始化 Lucide 图标
+      lucide.createIcons();
+
+      // ===========================================
+      //           AI助手组件JavaScript代码
+      // ===========================================
+
+      let isMiniChatOpen = false;
+      let isFullscreenOpen = false;
+      let isSidebarOpen = true;
+
+      // 用户管理系统
+      // test
+      let currentUser = {
+        uid: 0,
+        utype: 0, // 0: 普通用户, 1: 专业用户
+        uname: "Root",
+      };
+
+      let chatHistory = [];
+      let currentSessionId = null;
+      let currentFiles = [];
+
+      // Ollama API 配置
+      const OLLAMA_CONFIG = {
+        baseUrl: "http://localhost:11434", // Ollama默认端口
+        model: "AgriGik",
+      };
+
+      // --- DOM Element Getters ---
+      const getEl = (id) => document.getElementById(id);
+
+      // --- 用户管理系统 ---
+      // async function initializeUser() {
+      //   try {
+      //     // 从URL参数获取用户信息
+      //     const urlParams = new URLSearchParams(window.location.search);
+      //     const uid = urlParams.get("uid");
+      //     const utype = parseInt(urlParams.get("utype")) || 0;
+      //     const uname = urlParams.get("uname");
+
+      //     if (uid) {
+      //       await setCurrentUser(uid, utype, uname);
+      //     } else {
+      //       // 如果没有用户信息，重定向到登录页面
+      //       window.location.href = "/login";
+      //       return;
+      //     }
+      //   } catch (error) {
+      //     console.error("用户初始化失败:", error);
+      //     // 重定向到登录页面
+      //     window.location.href = "/login";
+      //   }
+      // }
+
+      async function setCurrentUser(uid, utype = 0, uname = null) {
+        if (!uid) {
+          throw new Error("用户UID不能为空");
+        }
+
+        currentUser = {
+          uid: uid,
+          utype: utype,
+          uname: uname,
+        };
+
+        // 保存用户信息到localStorage
+        localStorage.setItem("currentUser", JSON.stringify(currentUser));
+
+        // 加载该用户的历史记录
+        await loadUserChatHistory();
+
+        console.log("当前用户:", currentUser);
+        return currentUser;
+      }
+
+      async function getCurrentUserFromBackend() {
+        try {
+          // 后端接口调用
+          const response = await fetch("/api/user/current", {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (response.ok) {
+            const userData = await response.json();
+            await setCurrentUser(userData.uid, userData.utype, userData.uname);
+            return userData;
+          } else {
+            throw new Error("获取用户信息失败");
+          }
+        } catch (error) {
+          console.error("后端获取用户信息失败:", error);
+          throw error;
+        }
+      }
+
+      function getUserStorageKey(suffix = "") {
+        return `aiChatHistory_${currentUser.uid}${suffix ? "_" + suffix : ""}`;
+      }
+
+      async function loadUserChatHistory() {
+        try {
+          const storageKey = getUserStorageKey();
+          const historyData = localStorage.getItem(storageKey);
+          chatHistory = historyData ? JSON.parse(historyData) : [];
+          console.log(
+            `加载用户 ${currentUser.uid} 的历史记录:`,
+            chatHistory.length,
+            "条"
+          );
+        } catch (error) {
+          console.error("加载用户历史记录失败:", error);
+          chatHistory = [];
+        }
+      }
+
+      function saveUserChatHistory() {
+        try {
+          const storageKey = getUserStorageKey();
+          localStorage.setItem(storageKey, JSON.stringify(chatHistory));
+          console.log(
+            `保存用户 ${currentUser.uid} 的历史记录:`,
+            chatHistory.length,
+            "条"
+          );
+        } catch (error) {
+          console.error("保存用户历史记录失败:", error);
+        }
+      }
+
+      // --- 初始化 ---
+
+      // 初始化用户
+      async function initializeUser() {
+        try {
+          // 尝试从localStorage获取用户信息
+          const savedUser = localStorage.getItem("currentUser");
+          if (savedUser) {
+            currentUser = JSON.parse(savedUser);
+            await loadUserChatHistory();
+          } else {
+            // 设置默认用户
+            await setCurrentUser("default_user", 0, "访客");
+          }
+
+          // 更新问候语
+          updateGreeting();
+
+          console.log("用户初始化完成:", currentUser);
+        } catch (error) {
+          console.error("用户初始化失败:", error);
+          // 设置默认用户
+          await setCurrentUser("default_user", 0, "访客");
+          updateGreeting();
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", async function () {
+        // 初始化图标
+        lucide.createIcons();
+
+        // 初始化用户管理系统
+        await initializeUser();
+
+        // 初始化主题
+        initializeTheme();
+
+        // 添加键盘快捷键
+        document.addEventListener("keydown", function (e) {
+          // Ctrl/Cmd + K 快速打开助手
+          if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+            e.preventDefault();
+            if (!isFullscreenOpen) {
+              openFullscreen();
+            }
+          }
+          // Escape 关闭助手
+          if (e.key === "Escape") {
+            if (isFullscreenOpen) {
+              closeFullscreen();
+            } else if (isMiniChatOpen) {
+              toggleMiniChat();
+            }
+          }
+        });
+
+        // 添加页面可见性检测
+        document.addEventListener("visibilitychange", function () {
+          if (document.hidden) {
+            saveCurrentSession();
+          }
+        });
+      });
+
+      // --- 主题切换功能 ---
+      function initializeTheme() {
+        const savedTheme = localStorage.getItem("theme") || "light";
+        if (
+          savedTheme === "dark" ||
+          (!savedTheme &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ) {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+        updateThemeIcons();
+      }
+
+      function toggleTheme() {
+        const isDark = document.documentElement.classList.contains("dark");
+        if (isDark) {
+          document.documentElement.classList.remove("dark");
+          localStorage.setItem("theme", "light");
+        } else {
+          document.documentElement.classList.add("dark");
+          localStorage.setItem("theme", "dark");
+        }
+        updateThemeIcons();
+      }
+
+      function updateThemeIcons() {
+        const isDark = document.documentElement.classList.contains("dark");
+        const sunIcon = getEl("sunIcon");
+        const moonIcon = getEl("moonIcon");
+
+        if (isDark) {
+          if (sunIcon) sunIcon.classList.remove("hidden");
+          if (moonIcon) moonIcon.classList.add("hidden");
+        } else {
+          if (sunIcon) sunIcon.classList.add("hidden");
+          if (moonIcon) moonIcon.classList.remove("hidden");
+        }
+      }
+
+      // --- 头部按钮事件处理 ---
+      function handleHeaderButtonClick(event, actionName) {
+        // 阻止事件冒泡和默认行为
+        event.stopPropagation();
+        event.preventDefault();
+
+        // 防抖处理 - 防止快速重复点击
+        const button = event.currentTarget;
+        if (button.disabled) return;
+
+        button.disabled = true;
+        button.style.pointerEvents = "none";
+
+        setTimeout(() => {
+          button.disabled = false;
+          button.style.pointerEvents = "auto";
+        }, 300);
+
+        // 根据动作名称执行相应函数
+        switch (actionName) {
+          case "toggleSidebar":
+            toggleSidebar();
+            break;
+          case "exportAllHistory":
+            exportAllHistory();
+            break;
+          case "closeFullscreen":
+            closeFullscreen();
+            break;
+          default:
+            console.warn("Unknown action:", actionName);
+        }
+      }
+
+      // --- UI Toggles ---
+      function toggleMiniChat() {
+        isMiniChatOpen = !isMiniChatOpen;
+        const miniChat = getEl("aiMiniChat");
+        const button = getEl("aiButton");
+
+        if (isMiniChatOpen) {
+          miniChat.classList.add("active");
+          button.classList.add("active");
+          getEl("aiBadge").classList.add("hidden");
+
+          // 显示迷你预设问题（如果消息只有欢迎消息）
+          const miniMessages = getEl("aiMiniMessages");
+          if (miniMessages && miniMessages.children.length <= 2) {
+            // 欢迎消息 + 预设问题
+            const miniExampleQuestions = getEl("miniExampleQuestions");
+            if (miniExampleQuestions) {
+              miniExampleQuestions.style.display = "block";
+            }
+          }
+
+          setTimeout(() => {
+            const input = getEl("aiMiniInput");
+            if (input) input.focus();
+          }, 300);
+        } else {
+          miniChat.classList.remove("active");
+          button.classList.remove("active");
+        }
+      }
+
+      function openFullscreen() {
+        isFullscreenOpen = true;
+        const modal = getEl("aiModal");
+        modal.classList.add("active");
+
+        if (!currentSessionId) {
+          startNewChat();
+        } else {
+          loadSessionById(currentSessionId);
+          // 如果加载的会话只有欢迎消息，显示预设问题
+          const messages = getEl("aiFullMessages");
+          if (messages && messages.children.length <= 1) {
+            const exampleQuestions = getEl("exampleQuestions");
+            if (!exampleQuestions) {
+              // 如果没有预设问题，重新创建
+              startNewChat();
+            }
+          }
+        }
+
+        loadChatHistory();
+
+        if (isMiniChatOpen) {
+          toggleMiniChat();
+        }
+
+        // 添加模态框事件监听器，防止点击穿透
+        modal.addEventListener("click", handleModalClick);
+
+        // 添加动画效果
+        requestAnimationFrame(() => {
+          document.body.style.overflow = "hidden";
+        });
+      }
+
+      function closeFullscreen() {
+        isFullscreenOpen = false;
+        saveCurrentSession();
+
+        const modal = getEl("aiModal");
+        modal.classList.remove("active");
+
+        // 移除事件监听器
+        modal.removeEventListener("click", handleModalClick);
+
+        // 重置body样式
+        document.body.style.overflow = "";
+
+        // 延迟重置指针事件，确保动画完成
+        setTimeout(() => {
+          // 确保所有按钮都正常可用
+          document.querySelectorAll(".btn").forEach((btn) => {
+            btn.style.pointerEvents = "auto";
+            btn.disabled = false;
+          });
+        }, 350); // 稍微延长等待时间确保动画完成
+      }
+
+      // 处理模态框点击事件，防止意外关闭
+      function handleModalClick(event) {
+        // 只有点击模态框背景时才关闭，点击内容区域不关闭
+        if (event.target === event.currentTarget) {
+          closeFullscreen();
+        }
+      }
+
+      function toggleSidebar() {
+        isSidebarOpen = !isSidebarOpen;
+        const sidebar = getEl("aiSidebar");
+
+        if (isSidebarOpen) {
+          sidebar.classList.remove("hidden");
+        } else {
+          sidebar.classList.add("hidden");
+        }
+      }
+
+      // --- Message Handling ---
+      async function sendFullMessage() {
+        const input = getEl("aiFullInput");
+        const message = input.value.trim();
+
+        if (!message && currentFiles.length === 0) return;
+
+        // 确保用户已初始化
+        await initializeUser();
+
+        // 添加用户消息
+        if (message) {
+          addFullMessage(message, "user");
+
+          // 隐藏预设问题（如果还在显示）
+          const exampleQuestions = getEl("exampleQuestions");
+          if (exampleQuestions) {
+            exampleQuestions.style.display = "none";
+          }
+        }
+
+        // 添加文件消息
+        if (currentFiles.length > 0) {
+          currentFiles.forEach((file) => addFullFileMessage(file, "user"));
+        }
+
+        // 清空输入
+        input.value = "";
+        adjustTextareaHeight(input);
+        clearUploadedFiles();
+
+        // 显示AI正在输入的动画
+        showTypingIndicator();
+
+        try {
+          // 使用新的异步AI回复生成
+          const aiResponse = await generateAIResponseWithFiles(
+            message,
+            currentFiles
+          );
+          hideTypingIndicator();
+          addFullMessage(aiResponse, "ai");
+
+          // 保存聊天记录到用户专属存储
+          if (message) {
+            chatHistory.push({
+              timestamp: Date.now(),
+              userMessage: message,
+              aiResponse: aiResponse,
+              files: currentFiles.map((f) => f.name),
+            });
+            saveUserChatHistory();
+          }
+
+          currentFiles = [];
+          saveCurrentSession();
+        } catch (error) {
+          console.error("发送消息失败:", error);
+          hideTypingIndicator();
+          addFullMessage("抱歉，发送消息时出现错误，请稍后再试。", "ai");
+        }
+      }
+
+      async function sendMiniMessage() {
+        const input = getEl("aiMiniInput");
+        const message = input.value.trim();
+
+        if (!message) return;
+
+        // 确保用户已初始化
+        await initializeUser();
+
+        // 隐藏迷你预设问题
+        const miniExampleQuestions = getEl("miniExampleQuestions");
+        if (miniExampleQuestions) {
+          miniExampleQuestions.style.display = "none";
+        }
+
+        // 添加用户消息到迷你聊天
+        addMiniMessage(message, "user");
+        input.value = "";
+
+        try {
+          // 使用新的异步AI回复生成
+          const aiResponse = await generateAIResponse(message);
+          addMiniMessage(aiResponse, "ai");
+
+          // 保存聊天记录
+          chatHistory.push({
+            timestamp: Date.now(),
+            userMessage: message,
+            aiResponse: aiResponse,
+            files: [],
+          });
+          saveUserChatHistory();
+        } catch (error) {
+          console.error("发送消息失败:", error);
+          addMiniMessage("抱歉，发送消息时出现错误，请稍后再试。", "ai");
+        }
+      }
+
+      function selectMiniExampleQuestion(button) {
+        const question = button.getAttribute("data-question");
+        const input = getEl("aiMiniInput");
+
+        // 设置输入框内容
+        input.value = question;
+
+        // 隐藏预设问题
+        const miniExampleQuestions = getEl("miniExampleQuestions");
+        if (miniExampleQuestions) {
+          miniExampleQuestions.style.display = "none";
+        }
+
+        // 聚焦到输入框
+        input.focus();
+
+        // 添加按钮点击动画
+        button.style.transform = "scale(0.95)";
+        setTimeout(() => {
+          button.style.transform = "";
+        }, 150);
+
+        // 自动发送消息
+        setTimeout(() => {
+          sendMiniMessage();
+        }, 300);
+      }
+
+      function selectExampleQuestion(button) {
+        const question = button.getAttribute("data-question");
+        const input = getEl("aiFullInput");
+
+        // 设置输入框内容
+        input.value = question;
+        adjustTextareaHeight(input);
+
+        // 隐藏预设问题
+        const exampleQuestions = getEl("exampleQuestions");
+        if (exampleQuestions) {
+          exampleQuestions.style.display = "none";
+        }
+
+        // 聚焦到输入框
+        input.focus();
+
+        // 添加按钮点击动画
+        button.style.transform = "scale(0.95)";
+        setTimeout(() => {
+          button.style.transform = "";
+        }, 150);
+      }
+
+      function addFullMessage(content, sender) {
+        const container = getEl("aiFullMessages");
+        const messageWrapper = document.createElement("div");
+        messageWrapper.className = `message ${sender}`;
+
+        const avatarIcon =
+          sender === "user"
+            ? '<circle cx="12" cy="12" r="3"/>'
+            : '<img class="icon text-white relative z-10" src="chat-ui-svgrepo-com.svg" alt="Chat Icon" />';
+
+        messageWrapper.innerHTML = `
+                <div class="message-avatar ${sender}">
+                    ${avatarIcon}
+                </div>
+                <div class="message-content markdown-content">
+                  ${parseMarkdown(content)}
+                </div>
+              `;
+
+        container.appendChild(messageWrapper);
+        scrollToBottom("aiFullMessages");
+
+        // 重新初始化图标
+        lucide.createIcons();
+      }
+
+      function addMiniMessage(content, sender) {
+        const container = getEl("aiMiniMessages");
+        const messageWrapper = document.createElement("div");
+        messageWrapper.className = `message ${sender}`;
+
+        const avatarIcon =
+          sender === "user"
+            ? '<circle cx="12" cy="12" r="3"/>'
+            : '<img class="icon text-white relative z-10" src="chat-ui-svgrepo-com.svg" alt="Chat Icon" />';
+
+        messageWrapper.innerHTML = `
+                <div class="message-avatar ${sender}">
+                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    ${avatarIcon}
+                  </svg>
+                </div>
+                <div class="message-content">
+                  ${parseMarkdown(content)}
+                </div>
+              `;
+
+        container.appendChild(messageWrapper);
+        scrollToBottom("aiMiniMessages");
+
+        // 重新初始化图标
+        lucide.createIcons();
+      }
+
+      function showTypingIndicator() {
+        const container = getEl("aiFullMessages");
+        const indicator = document.createElement("div");
+        indicator.className = "message ai typing-indicator";
+        indicator.id = "typingIndicator";
+        indicator.innerHTML = `
+                <div class="message-avatar ai">
+                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </div>
+                <div class="message-content">
+                  <div class="loading-dots">
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                  </div>
+                </div>
+              `;
+
+        container.appendChild(indicator);
+        scrollToBottom("aiFullMessages");
+        lucide.createIcons();
+      }
+
+      function hideTypingIndicator() {
+        const indicator = getEl("typingIndicator");
+        if (indicator) {
+          indicator.remove();
+        }
+      }
+
+      // --- File Handling ---
+      function handleFullFileUpload(event) {
+        addFilesToUploadList(event.target.files);
+      }
+
+      function addFilesToUploadList(files) {
+        const container = getEl("aiUploadedFiles");
+
+        for (let file of files) {
+          currentFiles.push(file);
+
+          const fileDiv = document.createElement("div");
+          fileDiv.className = "file-item";
+          fileDiv.innerHTML = `
+                  <div class="file-info">
+                    <svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                      <polyline points="14,2 14,8 20,8"/>
+                      <line x1="16" y1="13" x2="8" y2="13"/>
+                      <line x1="16" y1="17" x2="8" y2="17"/>
+                    </svg>
+                    <span class="file-name">${file.name}</span>
+                  </div>
+                  <button onclick="removeFile(this, '${file.name}')" class="file-remove">
+                    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <line x1="18" y1="6" x2="6" y2="18"/>
+                      <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                  </button>
+                `;
+
+          container.appendChild(fileDiv);
+        }
+
+        lucide.createIcons();
+      }
+
+      function removeFile(button, fileName) {
+        currentFiles = currentFiles.filter((f) => f.name !== fileName);
+        button.parentElement.remove();
+      }
+
+      function clearUploadedFiles() {
+        currentFiles = [];
+        getEl("aiUploadedFiles").innerHTML = "";
+      }
+
+      function addFullFileMessage(file, sender) {
+        addFullMessage(`📁 已上传文件: ${file.name}`, sender);
+      }
+
+      // --- Session Management ---
+      function startNewChat() {
+        saveCurrentSession();
+        currentSessionId = Date.now();
+        clearUploadedFiles();
+
+        const container = getEl("aiFullMessages");
+        container.innerHTML = `
+                <div class="message ai">
+                  <div class="message-avatar ai">
+                    <img
+                      class="icon text-white relative z-10"
+                      src="chat-ui-svgrepo-com.svg"
+                      alt="Chat Icon"
+                    />
+                  </div>
+                  <div class="message-content">
+                    👋 您好！我是谷稷，有什么农业问题可以帮助您解答？
+                  </div>
+                </div>
+
+                <!-- 预设问题区域 -->
+                <div class="example-questions" id="exampleQuestions">
+                  <div class="example-questions-header">
+                    <h3>智慧农业助手</h3>
+                  </div>
+                  <div class="example-questions-grid">
+                    <button class="example-question" onclick="selectExampleQuestion(this)" data-question="我的番茄叶片背面出现了很多白色小飞虫，应该如何防治？">
+                      <div class="question-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                          <path d="M8 12l2 2 4-4"/>
+                        </svg>
+                      </div>
+                      <div class="question-text">
+                        <span class="question-title">病虫害智能诊断</span>
+                        <span class="question-desc">识别作物病害，提供防治方案</span>
+                      </div>
+                    </button>
+
+                    <button class="example-question" onclick="selectExampleQuestion(this)" data-question="我在广东，现在7月份适合种什么蔬菜？请给出详细的种植建议。">
+                      <div class="question-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/>
+                          <circle cx="12" cy="12" r="5"/>
+                        </svg>
+                      </div>
+                      <div class="question-text">
+                        <span class="question-title">种植决策支持</span>
+                        <span class="question-desc">根据地区和季节推荐作物</span>
+                      </div>
+                    </button>
+
+                    <button class="example-question" onclick="selectExampleQuestion(this)" data-question="A地块的土壤湿度在过去3小时内下降了50%，可能是什么原因？">
+                      <div class="question-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path d="M3 3v18h18"/>
+                          <path d="m7 16 4-4 4 4 4-4"/>
+                        </svg>
+                      </div>
+                      <div class="question-text">
+                        <span class="question-title">数据异常解读</span>
+                        <span class="question-desc">分析传感器数据波动原因</span>
+                      </div>
+                    </button>
+
+                    <button class="example-question" onclick="selectExampleQuestion(this)" data-question="如何为玉米制定科学的水肥一体化灌溉方案？">
+                      <div class="question-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path d="M7 16.3c2.2 0 4-1.8 4-4 0-1.5-.7-2.9-1.9-3.7-.6-.4-1.1-.7-1.1-1.4 0-.4.2-.8.4-1.1C9.1 5.4 10 5 11 5c.6 0 1.2.1 1.8.3"/>
+                          <path d="m11 2-1 2 1 2 1-2-1-2"/>
+                          <path d="M19.07 4.93A10 10 0 0 0 12 2"/>
+                          <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/>
+                          <path d="m14 14 1-1 1 1-1 1-1-1"/>
+                        </svg>
+                      </div>
+                      <div class="question-text">
+                        <span class="question-title">灌溉施肥指导</span>
+                        <span class="question-desc">制定水肥管理方案</span>
+                      </div>
+                    </button>
+
+                    <button class="example-question" onclick="selectExampleQuestion(this)" data-question="如何通过智能设备监测大棚内的温湿度和光照条件？">
+                      <div class="question-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <rect x="2" y="4" width="20" height="16" rx="2"/>
+                          <path d="m22 6-10 6L2 6"/>
+                        </svg>
+                      </div>
+                      <div class="question-text">
+                        <span class="question-title">智能设备应用</span>
+                        <span class="question-desc">环境监测与自动化控制</span>
+                      </div>
+                    </button>
+
+                    <button class="example-question" onclick="selectExampleQuestion(this)" data-question="分析我农场的产量数据，给出增产建议和优化方案。">
+                      <div class="question-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path d="M3 3v18h18"/>
+                          <path d="M7 12v4"/>
+                          <path d="M12 8v8"/>
+                          <path d="M17 4v12"/>
+                        </svg>
+                      </div>
+                      <div class="question-text">
+                        <span class="question-title">产量数据分析</span>
+                        <span class="question-desc">数据驱动的增产策略</span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              `;
+
+        // 重新初始化图标
+        lucide.createIcons();
+
+        loadChatHistory();
+      }
+
+      function saveCurrentSession() {
+        if (!currentSessionId) return;
+
+        const messagesContainer = getEl("aiFullMessages");
+        if (!messagesContainer || messagesContainer.children.length <= 1)
+          return;
+
+        // 获取第一条用户消息作为标题
+        const firstUserMessage = messagesContainer.querySelector(
+          ".message.user .message-content"
+        );
+        const title = firstUserMessage
+          ? firstUserMessage.textContent.substring(0, 30) + "..."
+          : "新对话";
+
+        const session = {
+          id: currentSessionId,
+          title,
+          html: messagesContainer.innerHTML,
+          timestamp: Date.now(),
+        };
+
+        const index = chatHistory.findIndex((s) => s.id === currentSessionId);
+        if (index > -1) {
+          chatHistory[index] = session;
+        } else {
+          chatHistory.unshift(session);
+        }
+
+        localStorage.setItem(
+          "aiChatHistory_modern",
+          JSON.stringify(chatHistory)
+        );
+      }
+
+      function loadSessionById(sessionId) {
+        const session = chatHistory.find((s) => s.id === sessionId);
+        if (session) {
+          currentSessionId = session.id;
+          getEl("aiFullMessages").innerHTML = session.html;
+          scrollToBottom("aiFullMessages");
+
+          // 重新初始化图标
+          lucide.createIcons();
+
+          // 高亮当前会话
+          updateHistorySelection(sessionId);
+        }
+      }
+
+      function loadChatHistory() {
+        const container = getEl("aiHistoryList");
+        container.innerHTML = "";
+
+        // 排序：置顶的在前，然后按时间排序
+        chatHistory.sort((a, b) => {
+          if (a.pinned && !b.pinned) return -1;
+          if (!a.pinned && b.pinned) return 1;
+          return b.timestamp - a.timestamp;
+        });
+
+        chatHistory.forEach((session) => {
+          const item = document.createElement("div");
+          item.className = "history-item";
+          item.dataset.sessionId = session.id;
+
+          if (session.id === currentSessionId) {
+            item.classList.add("active");
+          }
+
+          const isPinned = session.pinned || false;
+          if (isPinned) {
+            item.dataset.pinned = "true";
+          }
+
+          item.innerHTML = `
+                  <div class="history-content" onclick="loadSessionById(${
+                    session.id
+                  })">
+                    <div class="history-title-row">
+                      <h4 class="font-semibold text-sm truncate">${
+                        session.title
+                      }</h4>
+                      ${
+                        isPinned
+                          ? '<svg class="pin-icon w-3 h-3 text-yellow-500" viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v8H6a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h5v6a1 1 0 0 0 2 0v-6h5a1 1 0 0 0 1-1v-1a1 1 0 0 0-1-1h-2z"/></svg>'
+                          : ""
+                      }
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">${formatDate(
+                      session.timestamp
+                    )}</p>
+                  </div>
+                  <div class="history-actions">
+                    <button
+                      class="history-action-btn"
+                      onclick="event.stopPropagation(); togglePinSession(${
+                        session.id
+                      })"
+                      title="${isPinned ? "取消置顶" : "置顶"}"
+                    >
+                      <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M16 12V4a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v8H6a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h5v6a1 1 0 0 0 2 0v-6h5a1 1 0 0 0 1-1v-1a1 1 0 0 0-1-1h-2z"/>
+                      </svg>
+                    </button>
+                    <button
+                      class="history-action-btn delete"
+                      onclick="event.stopPropagation(); deleteSession(${
+                        session.id
+                      })"
+                      title="删除"
+                    >
+                      <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polyline points="3,6 5,6 21,6"></polyline>
+                        <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                      </svg>
+                    </button>
+                  </div>
+                `;
+
+          container.appendChild(item);
+        });
+      }
+
+      function updateHistorySelection(sessionId) {
+        const items = getEl("aiHistoryList").children;
+        for (let item of items) {
+          item.classList.toggle("active", item.dataset.sessionId == sessionId);
+        }
+      }
+
+      function togglePinSession(sessionId) {
+        const session = chatHistory.find((s) => s.id === sessionId);
+        if (session) {
+          session.pinned = !session.pinned;
+          localStorage.setItem(
+            "aiChatHistory_modern",
+            JSON.stringify(chatHistory)
+          );
+          loadChatHistory(); // 重新加载以更新显示
+        }
+      }
+
+      function deleteSession(sessionId) {
+        // 添加确认对话框
+        if (!confirm("确定要删除这个对话吗？此操作不可撤销。")) {
+          return;
+        }
+
+        // 如果删除的是当前会话，需要特殊处理
+        if (sessionId === currentSessionId) {
+          // 清空当前对话区域
+          const container = getEl("aiFullMessages");
+          container.innerHTML = "";
+          addFullMessage("你好！有什么可以帮助你的吗？", "ai");
+
+          // 重置当前会话ID
+          currentSessionId = null;
+        }
+
+        // 从历史记录中删除
+        chatHistory = chatHistory.filter((s) => s.id !== sessionId);
+        localStorage.setItem(
+          "aiChatHistory_modern",
+          JSON.stringify(chatHistory)
+        );
+
+        // 重新加载历史记录列表
+        loadChatHistory();
+      }
+
+      function clearAllHistory() {
+        if (!confirm("确定要清空所有历史记录吗？此操作不可撤销。")) {
+          return;
+        }
+
+        // 清空历史记录
+        chatHistory = [];
+        localStorage.setItem(
+          "aiChatHistory_modern",
+          JSON.stringify(chatHistory)
+        );
+
+        // 重置当前会话
+        currentSessionId = null;
+        const container = getEl("aiFullMessages");
+        container.innerHTML = "";
+        addFullMessage("你好！有什么可以帮助你的吗？", "ai");
+
+        // 重新加载历史记录列表
+        loadChatHistory();
+      }
+
+      function exportAllHistory() {
+        const dataStr = JSON.stringify(chatHistory, null, 2);
+        const blob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `ai_chat_history_${new Date().getTime()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      // --- Utils ---
+      function scrollToBottom(id) {
+        const element = getEl(id);
+        if (element) {
+          element.scrollTop = element.scrollHeight;
+        }
+      }
+
+      function adjustTextareaHeight(el) {
+        el.style.height = "auto";
+        el.style.height = Math.min(el.scrollHeight, 150) + "px";
+      }
+
+      function parseMarkdown(text) {
+        return text
+          .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+          .replace(/\*(.*?)\*/g, "<em>$1</em>")
+          .replace(/`(.*?)`/g, "<code>$1</code>")
+          .replace(/\n/g, "<br>");
+      }
+
+      // --- Ollama API 接口 ---
+      function getSystemPromptByUserType(utype) {
+        const prompts = {
+          0: `<prompt>
+
+      <role_definition>
+          <name>谷稷</name>
+          <identity>你是一个能看懂图片、会分析问题的智慧农业助手，专门服务于中国的一线农民朋友。</identity>
+          <core_values>
+              - **用户至上**: 我的存在就是为了让乡亲们省心省力，多打粮食。我的回答必须100%站在他们的角度。
+              - **绝对通俗**: 说的每一句话都要保证田间地头的伯伯阿姨们听得懂、用得上。绝不讲任何他们听不懂的词。
+              - **实用第一**: 不说空话理论，只给能直接上手操作的实用办法。
+              - **眼见为实**: 如果有图片，必须先仔细看图，根据图片里的情况来分析问题。
+          </core_values>
+      </role_definition>
+
+      <behavioral_guidelines>
+          <language_rules>
+              - **纯中文**: 全程必须只使用简体中文，禁止出现任何英文、拼音或繁体字。
+              - **口语化**: 使用大白话，可以带有一些亲切的语气词，如“呀”、“呢”、“啦”。但要用"我"来自称.
+              - **贴心小助手**: 语气温和,就像一位有智慧的朋友般.
+          </language_rules>
+          <knowledge_domain>
+              - **允许范围**: 只能回答和农业生产直接相关的问题，包括农作物种植、病虫害防治、土壤、施肥、养殖、农产品行情等。
+              - **禁止范围**: 绝对不能回答任何与农业无关的问题。如果被问到，必须按固定话术回应：“哎呀，这个问题可难住我啦，我是专门帮大家搞种植养殖的，别的事儿就不懂了。”
+          </knowledge_domain>
+      </behavioral_guidelines>
+
+      <execution_protocol>
+          <thought_process>
+              在生成最终回答前，你必须在内心遵循以下思考步骤：
+              1.  **分析问题**: 用户问的到底是什么事？最关心的点是什么？
+              2.  **构思方案**: 针对这个问题，最简单、最省钱、最管用的办法有哪几种？（最好物理方法和农药方法都想想）
+              3.  **语言转化**: 我该怎么用大白话把这些办法说明白？怎么说才能让对方一听就懂，不会搞错？
+          </thought_process>
+          <output_format>
+              - 直接回答核心问题，先给结论。
+              - 然后分点说明具体怎么做，步骤要清晰。
+              - 如果提到病虫害，必须先描述它的样子（比如多大、什么颜色、长在哪）。
+          </output_format>
+      </execution_protocol>
+
+      <golden_example>
+          <user_input>
+          我家棉花叶子上好多白色的小飞虫，一碰就乱飞，叶子背面还有些发黄，这是啥虫？咋治？
+          </user_input>
+          <model_output>
+          朋友你别急，听你这么一说，这八成是**白粉虱**，就是那种白色的小飞蛾子！这虫子最烦人了，吸棉花的汁液，还会让叶子变黄。
+
+          给你两个法子治它：
+
+          1.  **省钱的法子**：你去弄几张黄色的粘虫板，就挂在棉花杆子中间，比叶子高一点就行。白粉虱就喜欢黄色，自己就飞上去粘住了。这个法子最安全，没坏处。
+
+          2.  **见效快的法子**：如果虫子太多了，就得打药了。你去农药店买**吡虫啉**或者**啶虫脒**，这两种药都行。按照说明书上的量兑水，然后主要往棉花叶子的背面喷，因为这虫子和它的卵都藏在叶子背面。最好是早上或者傍晚，天不太热的时候喷。
+          </model_output>
+      </golden_example>
+
+      </prompt>`,
+
+          1: `<prompt>
+
+      <role_definition>
+          <name>谷稷 (AgriGik)</name>
+          <identity>你是一个高级多模态智慧农业AI，能够对用户提供的图像和文本进行联合分析，生成专家级的技术诊断报告。</identity>
+          <core_principles>
+              - **视觉优先 (Visual-First)**: 图像是核心证据。你的分析必须从视觉观察出发，并以视觉特征作为立论的基础。
+              - **逻辑推理 (Logical Reasoning)**: 严格遵循内部思考流程，从现象到假设，再到验证和结论，构建一个完整的、可追溯的逻辑链。
+              - **知识融合 (Knowledge Fusion)**: 将从图像中提取的视觉证据与你内置的农业科学知识库（植物病理学、生理学、昆虫学等）进行深度融合，以得出科学的结论。
+          </core_principles>
+      </role_definition>
+
+      <execution_protocol>
+          <language_rules>
+              - **专业术语**: 必须使用精确的专业术语。首次出现时，遵循“英文术语 (中文翻译)”格式，例如 'Photosynthesis (光合作用)'。
+              - **语言**: 以严谨的简体中文书面语为主。
+          </language_rules>
+          <internal_thought_process>
+              在生成回答前，你必须严格遵循以下多模态思维链：
+              1.  **视觉特征提取 (Visual Feature Extraction)**: 这是首要步骤。对用户提供的图像进行系统性分析。
+                  - *宏观层面 (如田间照片)*: 识别空间分布模式（如随机、聚集）、颜色异常区域、植株整体长势等。
+                  - *微观层面 (如叶片、镜检图)*: 识别病斑的形态（形状、颜色、边缘特征、有无轮纹）、病征（霉层、菌脓、孢子形态）、害虫的形态特征等。
+              2.  **文本信息解析 (Textual Information Parsing)**: 解析用户的文字提问，提取关键信息，如作物种类、地理位置、近期管理措施、问题描述等。
+              3.  **图文信息融合与假设生成 (Multimodal Fusion & Hypothesis Generation)**: 结合视觉证据和文本信息，生成1-3个最有可能的科学假设。例如：
+                  - *假设A*: 可能是由真菌引起的角斑病，因为病斑呈多角形且受叶脉限制。
+                  - *假设B*: 也可能是缺镁，因为黄化模式呈现肋间失绿。
+              4.  **假设验证与排除 (Hypothesis Verification & Elimination)**: 逐一评估每个假设。利用你的专业知识，寻找支持或反对该假设的决定性证据。例如：“虽然有黄化，但图像中病斑边缘有明显的坏死区域，这与单纯的营养缺乏症状不符，因此排除假设B。”
+              5.  **结论综合与报告生成 (Conclusion Synthesis & Report Generation)**: 确定最可信的诊断结论，并按照下方的强制输出结构，将整个分析和推理过程组织成一份条理清晰的报告。
+          </internal_thought_process>
+
+          <mandatory_output_structure>
+              你的回答必须严格遵循以下结构，并使用Markdown标题：
+
+              ### 1. 核心诊断 (Executive Diagnosis)
+                 直接给出最可能的诊断结论。
+
+              ### 2. 视觉证据分析 (Visual Evidence Analysis)
+                 详细描述你在图像中观察到的关键视觉特征，并解释这些特征的病理学或生理学意义。这是支撑你诊断结论的核心依据。
+
+              ### 3. 诊断推理过程 (Diagnostic Reasoning)
+                 展示你的思维链。说明你如何基于视觉和文本信息提出假设，并如何进行验证和排除，最终得出结论。
+
+              ### 4. 技术建议 (Technical Recommendations)
+                 基于诊断结论，提供防治、管理或进一步检测的专业建议。
+
+              ### 5. 鉴别诊断 (Differential Diagnosis)
+                 简要提及一些可能混淆的类似问题，并说明如何根据关键特征将它们与最终诊断区分开。
+          </mandatory_output_structure>
+      </execution_protocol>
+
+      <golden_example>
+          <user_input>
+          [图片：一张番茄叶片的显微镜照片，显示出同心轮纹的圆形褐色病斑，病斑上有黑色小点]
+
+          这是我们实验室温室栽培的番茄叶片，品种为'中杂9号'。近期湿度较高，叶片出现这些病斑。请进行诊断并提供分析报告。
+          </user_input>
+
+          <model_output>
+          ### 1. 核心诊断 (Executive Diagnosis)
+          根据提供的显微图像及描述，初步诊断为**番茄早疫病 (Tomato Early Blight)**，病原为茄链格孢菌 (Alternaria solani)。
+
+          ### 2. 视觉证据分析 (Visual Evidence Analysis)
+          图像分析揭示了以下关键病理学特征：
+          - **病斑形态**: 病斑呈圆形至近圆形，颜色为深褐色。
+          - **典型病征**: 病斑上具有非常清晰的、深浅相间的**同心轮纹 (Concentric Rings)**，这是番茄早疫病的典型特征，形似靶心。
+          - **产孢结构**: 在病斑的深色轮纹上，可见大量黑色小点，这些是病原菌的分生孢子梗和分生孢子。
+
+          ### 3. 诊断推理过程 (Diagnostic Reasoning)
+          我的诊断流程如下：
+          1.  **初步观察**: 图像显示了具有同心轮纹的坏死性病斑。文本信息指明作物为番茄，环境湿度高。
+          2.  **假设生成**: 基于“番茄”+“叶片病斑”+“同心轮纹”这三个核心特征，我生成了首要假设：番茄早疫病。同时，考虑了其他可能引起叶斑的病害作为备选假设，如叶霉病、斑枯病等。
+          3.  **假设验证**: 番茄叶霉病主要在叶背产生霉层，斑枯病病斑中央呈灰白色且散生小黑点，这都与图像中的“靶轮状”同心轮纹特征不符。图像中的特征与早疫病的典型病征高度匹配。结合文本中“湿度较高”的环境条件，这为喜湿的链格孢菌侵染创造了有利条件。因此，最终确认诊断为早疫病。
+
+          ### 4. 技术建议 (Technical Recommendations)
+          1.  **环境调控**: 立即降低温室湿度，加强通风，是控制病害发展的关键。
+          2.  **化学防治**: 可选用保护性杀菌剂如**代森锰锌**或**百菌清**进行初期预防；在发病初期，应立即喷洒内吸治疗性杀菌剂，如**苯醚甲环唑**、**嘧菌酯**或**异菌脲**。建议交替使用不同作用机理的药剂，以延缓抗药性。
+          3.  **农业防治**: 及时清除并销毁病残体，减少初侵染源。实行与非茄科作物轮作。
+
+          ### 5. 鉴别诊断 (Differential Diagnosis)
+          - **与晚疫病的区别**: 晚疫病病斑边缘不清晰，呈水浸状，湿度大时叶背或叶面会长出白色霉层，且没有同心轮纹。
+          - **与靶斑病的区别**: 靶斑病病斑也可能出现轮纹，但通常更小，且穿孔倾向更明显。早疫病的轮纹和“靶心”特征更为典型。
+          </model_output>
+      </golden_example>
+
+      </prompt>`,
+        };
+
+        return prompts[utype] || prompts[0];
+      }
+
+      async function callOllamaAPI(message, utype = 0, images = []) {
+        try {
+          const systemPrompt = getSystemPromptByUserType(utype);
+
+          const requestBody = {
+            model: OLLAMA_CONFIG.model,
+            system: systemPrompt,
+            prompt: message,
+            images: images,
+            stream: false,
+            options: {
+              temperature: 0.7,
+              top_p: 0.9,
+              top_k: 40,
+            },
+          };
+
+          console.log("发送到Ollama的请求:", requestBody);
+
+          const response = await fetch(`${OLLAMA_CONFIG.baseUrl}/api/chat`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestBody),
+          });
+
+          if (!response.ok) {
+            throw new Error(
+              `Ollama API调用失败: ${response.status} ${response.statusText}`
+            );
+          }
+
+          const data = await response.json();
+          console.log("Ollama返回数据:", data);
+
+          return data.message?.content || "抱歉，AI助手暂时无法回复。";
+        } catch (error) {
+          console.error("Ollama API调用错误:", error);
+          throw new Error("AI服务暂时不可用，请检查Ollama服务是否正常运行。");
+        }
+      }
+
+      async function generateAIResponse(message, utype = null) {
+        // 如果没有传入utype，使用当前用户的类型
+        const userType = utype !== null ? utype : currentUser.utype;
+
+        try {
+          return await callOllamaAPI(message, userType);
+        } catch (error) {
+          console.error("AI回复生成失败:", error);
+          throw new Error("AI助手暂时无法回复，请检查Ollama服务是否正常运行。");
+        }
+      }
+      // 如果imageFile为图片,需要转化为base64格式
+      async function generateAIResponseWithImage(message, imageFile) {
+        const reader = new FileReader();
+        reader.readAsDataURL(imageFile);
+        reader.onload = async () => {
+          const base64Image = reader.result.split(",")[1];
+          const response = await callOllamaAPI(message, {
+            images: [base64Image],
+          });
+          return response;
+        };
+      }
+
+      function formatDate(timestamp) {
+        const date = new Date(timestamp);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+
+        if (diffMins < 1) return "刚刚";
+        if (diffMins < 60) return `${diffMins}分钟前`;
+        if (diffMins < 1440) return `${Math.floor(diffMins / 60)}小时前`;
+
+        return date.toLocaleDateString("zh-CN", {
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      // --- Event Listeners ---
+      document.addEventListener("DOMContentLoaded", function () {
+        // 输入框事件
+        const fullInput = getEl("aiFullInput");
+        if (fullInput) {
+          fullInput.addEventListener("input", (e) =>
+            adjustTextareaHeight(e.target)
+          );
+          fullInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              sendFullMessage();
+            }
+          });
+        }
+
+        const miniInput = getEl("aiMiniInput");
+        if (miniInput) {
+          miniInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              sendMiniMessage();
+            }
+          });
+        }
+
+        // 文件上传事件
+        const uploadArea = getEl("aiUploadArea");
+        if (uploadArea) {
+          uploadArea.addEventListener("click", () => {
+            getEl("fullFileInput").click();
+          });
+
+          uploadArea.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            uploadArea.classList.add("dragover");
+          });
+
+          uploadArea.addEventListener("dragleave", (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove("dragover");
+          });
+
+          uploadArea.addEventListener("drop", (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove("dragover");
+            addFilesToUploadList(e.dataTransfer.files);
+          });
+        }
+
+        // 页面卸载前保存
+        window.addEventListener("beforeunload", saveCurrentSession);
+      });
+    </script>
+
+    <!-- 在页面加载完成后初始化图标 -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        lucide.createIcons();
+      });
+    </script>
+  </body>
+</html>
