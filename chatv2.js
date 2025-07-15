@@ -49,13 +49,17 @@
     .icon { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; flex-shrink: 0; }
     .icon-sm { width: 16px; height: 16px; }
     .icon-lg { width: 28px; height: 28px; }
+    .icon-avatar { width: 24px; height: 24px; filter: brightness(0) invert(1); }
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; border: none; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-decoration: none; outline: none; }
     .btn-primary { background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%); color: white; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); }
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.6); }
     .btn-secondary { background: rgba(255, 255, 255, 0.9); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
     .btn-secondary:hover { background: #10b981; color: white; }
+    .btn-danger { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3); }
+    .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(231, 76, 60, 0.5); background: linear-gradient(135deg, #c0392b 0%, #a93226 100%); }
     .btn-sm { padding: 8px 16px; font-size: 12px; border-radius: 8px; }
     .btn-floating { position: fixed; bottom: 24px; right: 24px; height: 56px; min-width: 56px; padding: 0 20px; border-radius: 28px; background: linear-gradient(135deg, #1f2937 0%, #374151 100%); color: white; border: none; cursor: pointer; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2); transition: all 0.3s ease; z-index: 9999; display: flex; align-items: center; justify-content: center; gap: 12px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 500; font-size: 14px; overflow: hidden; backdrop-filter: blur(10px); }
+    .btn-full-width { width: 100%; }
     .floating-content { display: flex; align-items: center; justify-content: center; gap: 10px; position: relative; z-index: 10; }
     .floating-icon { width: 20px; height: 20px; filter: brightness(0) invert(1); flex-shrink: 0; }
     .floating-text { font-weight: 600; letter-spacing: 0.025em; white-space: nowrap; }
@@ -75,13 +79,20 @@
     .chat-messages::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.3); border-radius: 2px; }
     .message { display: flex; align-items: flex-start; gap: 12px; max-width: 85%; opacity: 0; transform: translateY(20px); animation: slideInUp-anim 0.3s ease-out forwards; }
     @keyframes slideInUp-anim { to { opacity: 1; transform: translateY(0); } }
-    .message.user { flex-direction: row-reverse; align-self: flex-end; }
+    .message.user { flex-direction: row; align-self: flex-end; gap: 0; }
+    .message.ai { flex-direction: row; align-self: flex-start; }
     .message-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; font-weight: 600; position: relative; overflow: hidden; }
-    .message-avatar.user { background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%); color: white; }
+    .message-avatar.user { display: none; }
     .message-avatar.ai { background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); color: white; }
-    .message-content { padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
-    .message.user .message-content { background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%); color: white; border-bottom-right-radius: 4px; }
+    .message-content { padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.6; word-wrap: break-word; }
+    .message.user .message-content { background: #e5e7eb; color: #374151; border-radius: 18px; }
     .message.ai .message-content { background: #f8f9fa; color: #2d3748; border-bottom-left-radius: 4px; }
+    
+    /* 消息内容优化 */
+    .message-content > p:first-child { margin-top: 0; }
+    .message-content > p:last-child { margin-bottom: 0; }
+    .message-content > *:first-child { margin-top: 0; }
+    .message-content > *:last-child { margin-bottom: 0; }
     .chat-input { padding: 20px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-top: 1px solid rgba(0, 0, 0, 0.1); }
     .input-container { display: flex; align-items: center; gap: 12px; background: white; border-radius: 25px; padding: 8px 16px; border: 1px solid rgba(0, 0, 0, 0.1); }
     .input-container input { flex: 1; border: none; outline: none; padding: 8px 0; font-size: 14px; background: transparent; }
@@ -93,22 +104,28 @@
     .fullscreen-title { font-size: 24px; font-weight: 700; display: flex; align-items: center; gap: 16px; }
     .fullscreen-actions { display: flex; gap: 12px; }
     .fullscreen-content { flex: 1; display: flex; overflow: hidden; }
-    .sidebar { width: 300px; background: white; border-right: 1px solid rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; transition: all 0.3s ease; }
+    .sidebar { width: 280px; background: white; border-right: 1px solid rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; transition: all 0.3s ease; }
     .sidebar.hidden { width: 0; overflow: hidden; }
-    .sidebar-header { padding: 24px; border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
-    .sidebar-content { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+    .sidebar-header { padding: 16px; border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+    .sidebar-header-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+    .sidebar-content { flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 4px; }
     .sidebar-content::-webkit-scrollbar { width: 6px; }
     .sidebar-content::-webkit-scrollbar-thumb { background: rgba(102, 126, 234, 0.3); border-radius: 3px; }
-    .history-item { position: relative; overflow: hidden; border-radius: 12px; transition: all 0.2s ease; margin-bottom: 8px; border: 1px solid transparent; display: flex; align-items: center; justify-content: space-between; }
-    .history-content { flex: 1; padding: 16px; cursor: pointer; min-width: 0; }
+    .history-item { position: relative; overflow: hidden; border-radius: 8px; transition: all 0.2s ease; margin-bottom: 2px; border: 1px solid transparent; display: flex; align-items: center; justify-content: space-between; background: transparent; }
+    .history-item:hover { background: rgba(0, 0, 0, 0.05); }
+    .history-content { flex: 1; padding: 8px 12px; cursor: pointer; min-width: 0; }
     .history-title-row { display: flex; align-items: center; gap: 6px; }
+    .history-title { font-size: 13px; font-weight: 500; color: var(--text-primary); line-height: 1.2; }
+    .history-date { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
     .pin-icon { flex-shrink: 0; }
-    .history-actions { display: flex; flex-direction: column; gap: 4px; padding: 8px; opacity: 0; transition: opacity 0.2s ease; }
+    .history-actions { display: flex; flex-direction: column; gap: 4px; padding: 4px; opacity: 0; transition: opacity 0.2s ease; }
     .history-item:hover .history-actions { opacity: 1; }
-    .history-action-btn { display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: none; border-radius: 6px; background: rgba(255, 255, 255, 0.1); color: var(--text-secondary); cursor: pointer; transition: all 0.2s ease; }
+    .history-action-btn { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border: none; border-radius: 4px; background: rgba(255, 255, 255, 0.1); color: var(--text-secondary); cursor: pointer; transition: all 0.2s ease; }
     .history-action-btn:hover { background: rgba(16, 185, 129, 0.2); color: #10b981; transform: scale(1.1); }
     .history-action-btn.delete:hover { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
-    .history-item.active { background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%); color: white; }
+    .history-item.active { background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%); color: white; border-radius: 8px; }
+    .history-item.active .history-title { color: white; }
+    .history-item.active .history-date { color: rgba(255, 255, 255, 0.8); }
     .main-chat { flex: 1; display: flex; flex-direction: column; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); }
     .main-messages { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
     .main-messages::-webkit-scrollbar { width: 6px; }
@@ -143,9 +160,11 @@
     .uploaded-files { margin-bottom: 16px; }
     .file-item { display: flex; align-items: center; justify-content: space-between; background: #f7fafc; padding: 12px 16px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #e2e8f0; }
     .file-info { display: flex; align-items: center; gap: 12px; }
-    .file-icon { width: 24px; height: 24px; color: #667eea; }
+    .file-icon { width: 24px; height: 24px; color: #667eea; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
     .file-name { font-size: 14px; color: #2d3748; font-weight: 500; }
-    .file-remove { width: 24px; height: 24px; border-radius: 50%; border: none; background: #fed7d7; color: #e53e3e; cursor: pointer; transition: all 0.2s ease; }
+    .file-remove { width: 24px; height: 24px; border-radius: 50%; border: none; background: #fed7d7; color: #e53e3e; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; }
+    .file-remove:hover { background: #fecaca; transform: scale(1.1); }
+    .file-remove svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; }
     .notification-badge { position: absolute; top: -8px; right: -8px; width: 20px; height: 20px; background: #e53e3e; color: white; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
     .loading-dots { display: inline-flex; gap: 4px; }
     .loading-dot { width: 6px; height: 6px; border-radius: 50%; background: #10b981; animation: loading-bounce-anim 1.4s infinite both; }
@@ -153,7 +172,120 @@
     .loading-dot:nth-child(2) { animation-delay: -0.16s; }
     @keyframes loading-bounce-anim { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
     .hidden { display: none !important; }
-    @media (max-width: 768px) { .sidebar { width: 280px; } .main-messages { padding: 20px; } }
+    
+    /* Markdown样式 */
+    .ai-code-block {
+      background: #f6f8fa;
+      border: 1px solid #e1e5e9;
+      border-radius: 8px;
+      padding: 12px;
+      margin: 8px 0;
+      font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+      font-size: 13px;
+      line-height: 1.45;
+      overflow-x: auto;
+      color: #24292e;
+    }
+    
+    .ai-inline-code {
+      background: #f6f8fa;
+      border: 1px solid #e1e5e9;
+      border-radius: 4px;
+      padding: 2px 4px;
+      font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+      font-size: 0.9em;
+      color: #e11d48;
+    }
+    
+    .ai-heading {
+      margin: 16px 0 8px 0;
+      font-weight: 600;
+      line-height: 1.25;
+    }
+    
+    .ai-h1 {
+      font-size: 1.6em;
+      border-bottom: 1px solid #e1e5e9;
+      padding-bottom: 8px;
+    }
+    
+    .ai-h2 {
+      font-size: 1.4em;
+      border-bottom: 1px solid #e1e5e9;
+      padding-bottom: 6px;
+    }
+    
+    .ai-h3 {
+      font-size: 1.2em;
+    }
+    
+    .ai-bold {
+      font-weight: 600;
+    }
+    
+    .ai-italic {
+      font-style: italic;
+    }
+    
+    .ai-link {
+      color: #0969da;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+    
+    .ai-link:hover {
+      text-decoration: underline;
+      border-bottom-color: #0969da;
+    }
+    
+    .ai-list, .ai-ordered-list {
+      margin: 8px 0;
+      padding-left: 20px;
+    }
+    
+    .ai-list-item, .ai-ordered-item {
+      margin: 4px 0;
+      line-height: 1.5;
+    }
+    
+    .ai-blockquote {
+      border-left: 4px solid #d0d7de;
+      padding-left: 16px;
+      margin: 8px 0;
+      color: #656d76;
+      font-style: italic;
+    }
+    
+    .ai-divider {
+      border: none;
+      height: 1px;
+      background: #d0d7de;
+      margin: 16px 0;
+    }
+    
+    /* 代码块语法高亮 */
+    .language-javascript, .language-js {
+      color: #d73a49;
+    }
+    
+    .language-python {
+      color: #005cc5;
+    }
+    
+    .language-html {
+      color: #e34c26;
+    }
+    
+    .language-css {
+      color: #1572b6;
+    }
+    
+    .language-json {
+      color: #032f62;
+    }
+    
+    @media (max-width: 768px) { .sidebar { width: 260px; } .main-messages { padding: 20px; } }
     `;
 
   // --- 4. 定义插件的HTML结构 (来自 chatv2.html) ---
@@ -162,7 +294,7 @@
         <button id="aiButton" onclick="toggleMiniChat()" class="btn-floating">
           <div class="pulse-ring"></div>
           <div class="floating-content">
-            <img class="floating-icon" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIxIDEyQzIxIDE2Ljk3MDYgMTYuOTcwNiAyMSAxMiAyMUMxMC41MDEyIDIxIDkuMTAzNzYgMjAuNjM0NSA3Ljg4NDg5IDIwLjAxOEM3LjI5MTc0IDE5LjY5NzUgNi41ODQyMyAxOS42OTk3IDYuMDA0ODcgMjAuMDIxOEwzLjkzMTA0IDIxLjc5NDlDMy4xOTQ3IDIyLjQxNTYgMi4wNTEwMyAyMS44NDU5IDIuMjAyMDggMjAuOTk5OEwzLjA2NDE0IDE3LjYxMDRDMy4yMzQyIDE2Ljk1NjYgMy4wMjc3NSAxNi4yNDQ1IDIuNTQ0OTggMTUuNzYxN0MyLjEzMzU2IDE1LjM0NzcgMS44MDMyNCAxNC44MTk1IDEuNTY2MjggMTQuMjIxMkMxLjAxOTM3IDEyLjc4ODUgMSAxMS4xOTI0IDEgOC4yNUMxIDQuMjQ4NzMgNS4yNDg3MyAxIDkgMUgxOEMxOS42NTY5IDEgMjEgMi4zNDMxNSAyMSAxMVYxMloiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPgo=" alt="Chat Icon"/>
+            <img class="floating-icon" src="chat-ui-svgrepo-com.svg" alt="Chat Icon"/>
             <span class="floating-text">问AI</span>
           </div>
           <div id="aiBadge" class="notification-badge hidden">1</div>
@@ -170,8 +302,8 @@
         <div id="aiMiniChat" class="chat-container">
           <div class="chat-header">
             <div class="chat-title">
-              <svg class="icon text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 12l2 2 4-4" /><path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3" /><path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3" /><path d="M12 3c0 1-1 3-3 3s-3-2-3-3 1-3 3-3 3 2 3 3" /><path d="M12 21c0-1 1-3 3-3s3 2 3 3-1 3-3 3-3-2-3-3" /></svg>
-              AI 助手
+              <img class="icon-avatar" src="crops4.svg" alt="AgriGik"/>
+              AgriGik
             </div>
             <div class="chat-actions">
               <button class="chat-action-btn" onclick="openFullscreen()" title="全屏模式"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" /></svg></button>
@@ -179,7 +311,7 @@
             </div>
           </div>
           <div id="aiMiniMessages" class="chat-messages">
-            <div class="message ai"><div class="message-avatar ai"><img class="icon text-white relative z-10" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIxIDEyQzIxIDE2Ljk3MDYgMTYuOTcwNiAyMSAxMiAyMUMxMC41MDEyIDIxIDkuMTAzNzYgMjAuNjM0NSA3Ljg4NDg5IDIwLjAxOEM3LjI5MTc0IDE5LjY5NzUgNi41ODQyMyAxOS42OTk3IDYuMDA0ODcgMjAuMDIxOEwzLjkzMTA0IDIxLjc5NDlDMy4xOTQ3IDIyLjQxNTYgMi4wNTEwMyAyMS44NDU5IDIuMjAyMDggMjAuOTk5OEwzLjA2NDE0IDE3LjYxMDRDMy4yMzQyIDE2Ljk1NjYgMy4wMjc3NSAxNi4yNDQ1IDIuNTQ0OTggMTUuNzYxN0MyLjEzMzU2IDE1LjM0NzcgMS44MDMyNCAxNC44MTk1IDEuNTY2MjggMTQuMjIxMkMxLjAxOTM3IDEyLjc4ODUgMSAxMS4xOTI0IDEgOC4yNUMxIDQuMjQ4NzMgNS4yNDg3MyAxIDkgMUgxOEMxOS42NTY5IDEgMjEgMi4zNDMxNSAyMSAxMVYxMloiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPgo=" alt="Chat Icon"/></div><div class="message-content">👋 您好！我是谷稷，有什么可以帮助您的吗？</div></div>
+            <div class="message ai"><div class="message-avatar ai"><img class="icon-avatar" src="chat-ui-svgrepo-com.svg" alt="AgriGik"/></div><div class="message-content">👋 您好！我是谷稷，有什么可以帮助您的吗？</div></div>
             <div class="mini-example-questions" id="miniExampleQuestions">
               <div class="mini-questions-header"><span>农业问题咨询</span></div>
               <div class="mini-questions-list">
@@ -199,7 +331,9 @@
       </div>
       <div id="aiModal" class="fullscreen-modal">
         <div class="fullscreen-header">
-          <div class="fullscreen-title"><svg class="icon-lg text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 12l2 2 4-4" /><path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3" /><path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3" /><path d="M12 3c0 1-1 3-3 3s-3-2-3-3 1-3 3-3 3 2 3 3" /><path d="M12 21c0-1 1-3 3-3s3 2 3 3-1 3-3 3-3-2-3-3" /></svg>AI 智能助手</div>
+          <div class="fullscreen-title">
+          <img class="icon-avatar" src="crops4.svg" alt="AgriGik"/>
+          AgriGik</div>
           <div class="fullscreen-actions">
             <button onclick="handleHeaderButtonClick(event, 'toggleSidebar')" class="btn btn-secondary"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9,22 9,12 15,12 15,22" /></svg>历史记录</button>
             <button onclick="handleHeaderButtonClick(event, 'exportAllHistory')" class="btn btn-secondary"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7,10 12,15 17,10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>导出历史</button>
@@ -209,16 +343,18 @@
         <div class="fullscreen-content">
           <div id="aiSidebar" class="sidebar">
             <div class="sidebar-header">
-              <button onclick="startNewChat()" class="btn btn-primary w-full"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>新建对话</button>
-              <div class="sidebar-menu"><button onclick="clearAllHistory()" class="btn btn-secondary btn-sm w-full mt-2" title="清空所有历史记录"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3,6 5,6 21,6"></polyline><path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path></svg>清空历史</button></div>
+              <div class="sidebar-header-actions">
+                <button onclick="startNewChat()" class="btn btn-primary btn-full-width"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>新建对话</button>
+                <button onclick="clearAllHistory()" class="btn btn-danger btn-sm btn-full-width" title="清空所有历史记录"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3,6 5,6 21,6"></polyline><path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path></svg>清空历史</button>
+              </div>
             </div>
             <div id="aiHistoryList" class="sidebar-content"></div>
           </div>
           <div class="main-chat">
             <div id="aiFullMessages" class="main-messages">
               <div class="message ai">
-                  <div class="message-avatar ai"><img class="icon text-white relative z-10" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIxIDEyQzIxIDE2Ljk3MDYgMTYuOTcwNiAyMSAxMiAyMUMxMC41MDEyIDIxIDkuMTAzNzYgMjAuNjM0NSA3Ljg4NDg5IDIwLjAxOEM3LjI5MTc0IDE5LjY5NzUgNi41ODQyMyAxOS42OTk3IDYuMDA0ODcgMjAuMDIxOEwzLjkzMTA0IDIxLjc5NDlDMy4xOTQ3IDIyLjQxNTYgMi4wNTEwMyAyMS44NDU5IDIuMjAyMDggMjAuOTk5OEwzLjA2NDE0IDE3LjYxMDRDMy4yMzQyIDE2Ljk1NjYgMy4wMjc3NSAxNi4yNDQ1IDIuNTQ0OTggMTUuNzYxN0MyLjEzMzU2IDE1LjM0NzcgMS44MDMyNCAxNC44MTk1IDEuNTY2MjggMTQuMjIxMkMxLjAxOTM3IDEyLjc4ODUgMSAxMS4xOTI0IDEgOC4yNUMxIDQuMjQ4NzMgNS4yNDg3MyAxIDkgMUgxOEMxOS42NTY5IDEgMjEgMi4zNDMxNSAyMSAxMVYxMloiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPgo=" alt="Chat Icon"/></div>
-                  <div class="message-content">👋 欢迎使用AI智能助手！我可以帮助您解答问题、分析文档、进行创意思考等。请随时向我提问。</div>
+                  <div class="message-avatar ai"><img class="icon-avatar" src="chat-ui-svgrepo-com.svg" alt="AgriGik"/></div>
+                  <div class="message-content">👋 我是谷稷！我可以帮助您解答问题、分析文档、进行创意思考等。请随时向我提问。</div>
               </div>
               <div class="example-questions" id="exampleQuestions">
                   <div class="example-questions-header"><h3>智慧农业助手</h3></div>
@@ -235,12 +371,12 @@
                   <svg class="icon text-gray-500 mx-auto mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14,2 14,8 20,8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10,9 9,9 8,9" /></svg>
                   <p class="text-gray-600">点击或拖拽文件到此处上传</p><p class="text-sm text-gray-500 mt-1">支持多种文件格式</p>
               </div>
-              <input type="file" id="fullFileInput" class="hidden" onchange="handleFullFileUpload(event)" multiple/>
+              <input type="file" id="fullFileInput" class="hidden" multiple/>
               <div id="aiUploadedFiles" class="uploaded-files"></div>
               <div class="main-input-container">
                   <textarea id="aiFullInput" placeholder="输入您的问题... (Shift+Enter 换行)" class="main-input" rows="1"></textarea>
                   <div class="input-actions">
-                      <button onclick="document.getElementById('fullFileInput').click()" class="input-action-btn" title="上传文件"><svg class="icon" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66L9.64 16.2a2 2 0 0 1-2.83-2.83l8.49-8.49" /></svg></button>
+                      <button id="fileUploadBtn" class="input-action-btn" title="上传文件"><svg class="icon" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66L9.64 16.2a2 2 0 0 1-2.83-2.83l8.49-8.49" /></svg></button>
                       <button onclick="sendFullMessage()" class="input-action-btn primary" title="发送消息"><svg class="icon" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22,2 15,22 11,13 2,9 22,2" /></svg></button>
                   </div>
               </div>
@@ -288,7 +424,7 @@
       model: config.ollamaModel,
     };
 
-    // --- 核心逻辑开始 (从chatv2.html移植并修改) ---
+    // --- 核心逻辑---
 
     // 状态变量
     let isMiniChatOpen = false;
@@ -358,9 +494,6 @@
       }
     }
 
-    // 此处省略了 toggleTheme 和 updateThemeIcons 函数，因为插件中没有提供切换按钮
-    // 如果您未来需要在插件中添加主题切换按钮，请将chatv2.html中的相关函数加回此处。
-
     // UI 切换
     window.toggleMiniChat = function () {
       isMiniChatOpen = !isMiniChatOpen;
@@ -380,6 +513,7 @@
       }
     };
 
+    //全屏
     window.openFullscreen = function () {
       isFullscreenOpen = true;
       getEl("aiModal").classList.add("active");
@@ -402,6 +536,7 @@
       getEl("aiSidebar").classList.toggle("hidden", !isSidebarOpen);
     };
 
+    //处理按钮
     window.handleHeaderButtonClick = function (event, actionName) {
       event.stopPropagation();
       switch (actionName) {
@@ -422,11 +557,15 @@
       const input = getEl("aiFullInput");
       const message = input.value.trim();
       if (!message && currentFiles.length === 0) return;
+
+      // 创建文件副本用于发送
+      const filesToSend = [...currentFiles];
+
       if (message) {
         addFullMessage(message, "user");
         getEl("exampleQuestions").style.display = "none";
       }
-      currentFiles.forEach((file) => addFullFileMessage(file, "user"));
+      filesToSend.forEach((file) => addFullFileMessage(file, "user"));
       input.value = "";
       adjustTextareaHeight(input);
       clearUploadedFiles();
@@ -434,7 +573,7 @@
       try {
         const aiResponse = await generateAIResponseWithFiles(
           message,
-          currentFiles
+          filesToSend
         );
         hideTypingIndicator();
         addFullMessage(aiResponse, "ai");
@@ -442,7 +581,20 @@
       } catch (error) {
         console.error("发送消息失败:", error);
         hideTypingIndicator();
-        addFullMessage("抱歉，AI服务暂时不可用。", "ai");
+
+        // 根据错误类型提供不同的错误信息
+        let errorMessage = "抱歉，AI服务暂时不可用。";
+        if (error.message.includes("无法连接到Ollama")) {
+          errorMessage =
+            "❌ " +
+            error.message +
+            "\n\n请检查：\n1. Ollama是否已安装并运行\n2. 服务地址是否正确\n3. 网络连接是否正常";
+        } else if (error.message.includes("Ollama API调用失败")) {
+          errorMessage =
+            "❌ " + error.message + "\n\n请检查Ollama服务状态和模型是否可用。";
+        }
+
+        addFullMessage(errorMessage, "ai");
       }
     };
 
@@ -458,7 +610,12 @@
         addMiniMessage(aiResponse, "ai");
         saveCurrentSession();
       } catch (error) {
-        addMiniMessage("抱歉，AI服务暂时不可用。", "ai");
+        console.error("发送消息失败:", error);
+        let errorMessage = "抱歉，AI服务暂时不可用。";
+        if (error.message.includes("无法连接到Ollama")) {
+          errorMessage = "❌ 无法连接到Ollama服务";
+        }
+        addMiniMessage(errorMessage, "ai");
       }
     };
 
@@ -501,7 +658,7 @@
       const avatarIcon =
         sender === "user"
           ? `<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"></circle><path d="M5.5 21v-2.5c0-2.25 3.82-4.5 6.5-4.5s6.5 2.25 6.5 4.5V21"></path></svg>`
-          : `<img class="icon text-white relative z-10" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIxIDEyQzIxIDE2Ljk3MDYgMTYuOTcwNiAyMSAxMiAyMUMxMC41MDEyIDIxIDkuMTAzNzYgMjAuNjM0NSA3Ljg4NDg5IDIwLjAxOEM3LjI5MTc0IDE5LjY5NzUgNi41ODQyMyAxOS42OTk3IDYuMDA0ODcgMjAuMDIxOEwzLjkzMTA0IDIxLjc5NDlDMy4xOTQ3IDIyLjQxNTYgMi4wNTEwMyAyMS44NDU5IDIuMjAyMDggMjAuOTk5OEwzLjA2NDE0IDE3LjYxMDRDMy4yMzQyIDE2Ljk1NjYgMy4wMjc3NSAxNi4yNDQ1IDIuNTQ0OTggMTUuNzYxN0MyLjEzMzU2IDE1LjM0NzcgMS44MDMyNCAxNC44MTk1IDEuNTY2MjggMTQuMjIxMkMxLjAxOTM3IDEyLjc4ODUgMSAxMS4xOTI0IDEgOC4yNUMxIDQuMjQ4NzMgNS4yNDg3MyAxIDkgMUgxOEMxOS42NTY5IDEgMjEgMi4zNDMxNSAyMSAxMVYxMloiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPgo=" alt="Chat Icon"/>`;
+          : `<img class="icon-avatar" src="chat-ui-svgrepo-com.svg" alt="AgriGik"/>`;
 
       wrapper.innerHTML = `
                 <div class="message-avatar ${sender}">${avatarIcon}</div>
@@ -514,7 +671,7 @@
       const indicator = document.createElement("div");
       indicator.className = "message ai";
       indicator.id = "typingIndicator";
-      indicator.innerHTML = `<div class="message-avatar ai"><img class="icon text-white relative z-10" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIxIDEyQzIxIDE2Ljk3MDYgMTYuOTcwNiAyMSAxMiAyMUMxMC41MDEyIDIxIDkuMTAzNzYgMjAuNjM0NSA3Ljg4NDg5IDIwLjAxOEM3LjI5MTc0IDE5LjY5NzUgNi41ODQyMyAxOS42OTk3IDYuMDA0ODcgMjAuMDIxOEwzLjkzMTA0IDIxLjc5NDlDMy4xOTQ3IDIyLjQxNTYgMi4wNTEwMyAyMS44NDU5IDIuMjAyMDggMjAuOTk5OEwzLjA2NDE0IDE3LjYxMDRDMy4yMzQyIDE2Ljk1NjYgMy4wMjc3NSAxNi4yNDQ1IDIuNTQ0OTggMTUuNzYxN0MyLjEzMzU2IDE1LjM0NzcgMS44MDMyNCAxNC44MTk1IDEuNTY2MjggMTQuMjIxMkMxLjAxOTM3IDEyLjc4ODUgMSAxMS4xOTI0IDEgOC4yNUMxIDQuMjQ4NzMgNS4yNDg3MyAxIDkgMUgxOEMxOS42NTY5IDEgMjEgMi4zNDMxNSAyMSAxMVYxMloiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPgo=" alt="Chat Icon"/></div><div class="message-content"><div class="loading-dots"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div></div>`;
+      indicator.innerHTML = `<div class="message-avatar ai"><img class="icon-avatar" src="chat-ui-svgrepo-com.svg" alt="AgriGik"/></div><div class="message-content"><div class="loading-dots"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div></div>`;
       container.appendChild(indicator);
       scrollToBottom("aiFullMessages");
     }
@@ -525,22 +682,70 @@
 
     // 文件处理
     window.handleFullFileUpload = function (event) {
-      addFilesToUploadList(event.target.files);
+      const files = event.target.files;
+      if (files && files.length > 0) {
+        addFilesToUploadList(files);
+        // 重置文件input以允许重复上传相同文件
+        event.target.value = "";
+      }
     };
+
     function addFilesToUploadList(files) {
       const container = getEl("aiUploadedFiles");
       for (let file of files) {
         currentFiles.push(file);
         const fileDiv = document.createElement("div");
         fileDiv.className = "file-item";
-        fileDiv.innerHTML = `<div class="file-info"><svg class="file-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg><span class="file-name">${file.name}</span></div><button onclick="removeFile(this, '${file.name}')" class="file-remove"><svg class="icon-sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
+        fileDiv.setAttribute("data-filename", file.name);
+
+        // 创建文件信息部分
+        const fileInfo = document.createElement("div");
+        fileInfo.className = "file-info";
+        fileInfo.innerHTML = `
+          <svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14,2 14,8 20,8"/>
+          </svg>
+          <span class="file-name">${file.name}</span>
+        `;
+
+        // 创建删除按钮
+        const removeBtn = document.createElement("button");
+        removeBtn.className = "file-remove";
+        removeBtn.title = "删除文件";
+        removeBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        `;
+
+        // 绑定删除事件
+        removeBtn.addEventListener("click", () => {
+          removeFile(removeBtn, file.name);
+        });
+
+        fileDiv.appendChild(fileInfo);
+        fileDiv.appendChild(removeBtn);
         container.appendChild(fileDiv);
       }
-      lucide.createIcons();
+
+      // 重新初始化图标
+      if (window.lucide) {
+        lucide.createIcons();
+      }
     }
     window.removeFile = function (button, fileName) {
+      // 从文件数组中移除
       currentFiles = currentFiles.filter((f) => f.name !== fileName);
-      button.parentElement.remove();
+
+      // 从DOM中移除文件项
+      const fileItem = button.closest(".file-item");
+      if (fileItem) {
+        fileItem.remove();
+      }
+
+      console.log(`文件 "${fileName}" 已删除`);
     };
     function clearUploadedFiles() {
       currentFiles = [];
@@ -610,11 +815,11 @@
           if (session.id === currentSessionId) item.classList.add("active");
           item.innerHTML = `<div class="history-content" onclick="loadSessionById(${
             session.id
-          })"><h4 class="font-semibold text-sm truncate">${
+          })"><div class="history-title-row"><div class="history-title truncate">${
             session.title
-          }</h4><p class="text-xs text-gray-500 mt-1">${formatDate(
+          }</div></div><div class="history-date">${formatDate(
             session.timestamp
-          )}</p></div><div class="history-actions"><button class="history-action-btn delete" onclick="event.stopPropagation(); deleteSession(${
+          )}</div></div><div class="history-actions"><button class="history-action-btn delete" onclick="event.stopPropagation(); deleteSession(${
             session.id
           })" title="删除"><svg class="w-3 h-3 icon" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"></polyline><path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path></svg></button></div>`;
           container.appendChild(item);
@@ -665,7 +870,159 @@
       el.style.height = `${Math.min(el.scrollHeight, 150)}px`;
     }
     function parseMarkdown(text) {
-      return text.replace(/\n/g, "<br>");
+      // 确保text是字符串
+      if (typeof text !== "string") {
+        return String(text);
+      }
+
+      // 处理段落分割
+      let paragraphs = text.split("\n\n");
+
+      paragraphs = paragraphs.map((paragraph) => {
+        // 跳过空段落
+        if (!paragraph.trim()) return "";
+
+        // 代码块处理 (```code```)
+        paragraph = paragraph.replace(
+          /```(\w+)?\n?([\s\S]*?)```/g,
+          (match, lang, code) => {
+            const language = lang || "text";
+            return `<pre class="ai-code-block"><code class="language-${language}">${escapeHtml(
+              code.trim()
+            )}</code></pre>`;
+          }
+        );
+
+        // 行内代码处理 (`code`)
+        paragraph = paragraph.replace(
+          /`([^`\n]+)`/g,
+          '<code class="ai-inline-code">$1</code>'
+        );
+
+        // 标题处理
+        paragraph = paragraph.replace(
+          /^### (.*$)/gm,
+          '<h3 class="ai-heading ai-h3">$1</h3>'
+        );
+        paragraph = paragraph.replace(
+          /^## (.*$)/gm,
+          '<h2 class="ai-heading ai-h2">$1</h2>'
+        );
+        paragraph = paragraph.replace(
+          /^# (.*$)/gm,
+          '<h1 class="ai-heading ai-h1">$1</h1>'
+        );
+
+        // 粗体和斜体
+        paragraph = paragraph.replace(
+          /\*\*(.*?)\*\*/g,
+          '<strong class="ai-bold">$1</strong>'
+        );
+        paragraph = paragraph.replace(
+          /\*(.*?)\*/g,
+          '<em class="ai-italic">$1</em>'
+        );
+
+        // 链接处理
+        paragraph = paragraph.replace(
+          /\[([^\]]+)\]\(([^)]+)\)/g,
+          '<a href="$2" target="_blank" class="ai-link">$1</a>'
+        );
+
+        // 引用块处理
+        paragraph = paragraph.replace(
+          /^> (.*)$/gm,
+          '<blockquote class="ai-blockquote">$1</blockquote>'
+        );
+
+        // 分割线处理
+        paragraph = paragraph.replace(/^---$/gm, '<hr class="ai-divider">');
+
+        // 无序列表处理
+        let lines = paragraph.split("\n");
+        let inList = false;
+        let listItems = [];
+        let processedLines = [];
+
+        for (let line of lines) {
+          if (line.match(/^[\*\-\+] /)) {
+            if (!inList) {
+              inList = true;
+              listItems = [];
+            }
+            listItems.push(line.replace(/^[\*\-\+] /, ""));
+          } else if (line.match(/^\d+\. /)) {
+            if (!inList) {
+              inList = true;
+              listItems = [];
+            }
+            listItems.push({
+              ordered: true,
+              text: line.replace(/^\d+\. /, ""),
+            });
+          } else {
+            if (inList) {
+              // 结束列表
+              const isOrdered = listItems.length > 0 && listItems[0].ordered;
+              const listTag = isOrdered ? "ol" : "ul";
+              const listClass = isOrdered ? "ai-ordered-list" : "ai-list";
+              const itemClass = isOrdered ? "ai-ordered-item" : "ai-list-item";
+
+              let listHtml = `<${listTag} class="${listClass}">`;
+              listItems.forEach((item) => {
+                const itemText = typeof item === "string" ? item : item.text;
+                listHtml += `<li class="${itemClass}">${itemText}</li>`;
+              });
+              listHtml += `</${listTag}>`;
+
+              processedLines.push(listHtml);
+              inList = false;
+              listItems = [];
+            }
+            if (line.trim()) {
+              processedLines.push(line);
+            }
+          }
+        }
+
+        // 处理剩余的列表项
+        if (inList && listItems.length > 0) {
+          const isOrdered = listItems.length > 0 && listItems[0].ordered;
+          const listTag = isOrdered ? "ol" : "ul";
+          const listClass = isOrdered ? "ai-ordered-list" : "ai-list";
+          const itemClass = isOrdered ? "ai-ordered-item" : "ai-list-item";
+
+          let listHtml = `<${listTag} class="${listClass}">`;
+          listItems.forEach((item) => {
+            const itemText = typeof item === "string" ? item : item.text;
+            listHtml += `<li class="${itemClass}">${itemText}</li>`;
+          });
+          listHtml += `</${listTag}>`;
+
+          processedLines.push(listHtml);
+        }
+
+        paragraph = processedLines.join("\n");
+
+        // 换行处理
+        paragraph = paragraph.replace(/\n/g, "<br>");
+
+        // 如果不是标题、列表、代码块或引用，包装为段落
+        if (!paragraph.match(/^<(h[1-6]|ul|ol|pre|blockquote|hr)/)) {
+          paragraph = `<p>${paragraph}</p>`;
+        }
+
+        return paragraph;
+      });
+
+      return paragraphs.filter((p) => p.trim()).join("");
+    }
+
+    // HTML转义函数
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
     }
     function formatDate(timestamp) {
       const date = new Date(timestamp);
@@ -682,46 +1039,250 @@
     // Ollama API 调用
     function getSystemPromptByUserType(utype) {
       const prompts = {
-        0: `<prompt><identity>你是一个能看懂图片、会分析问题的智慧农业助手，专门服务于中国的一线农民朋友。</identity><core_values>- **用户至上**: 我的存在就是为了让乡亲们省心省力，多打粮食。- **绝对通俗**: 说的每一句话都要保证田间地头的伯伯阿姨们听得懂、用得上。- **实用第一**: 不说空话理论，只给能直接上手操作的实用办法。</core_values><behavioral_guidelines><language_rules>- **纯中文**: 全程必须只使用简体中文。- **口语化**: 使用大白话，可以带有一些亲切的语气词。- **贴心小助手**: 语气温和,就像一位有智慧的朋友般.</language_rules><knowledge_domain>- **允许范围**: 只能回答和农业生产直接相关的问题。- **禁止范围**: 绝对不能回答任何与农业无关的问题。如果被问到，必须按固定话术回应：“哎呀，这个问题可难住我啦，我是专门帮大家搞种植养殖的，别的事儿就不懂了。”</knowledge_domain></behavioral_guidelines></prompt>`,
-        1: `<prompt><identity>你是一个高级多模态智慧农业AI，能够对用户提供的图像和文本进行联合分析，生成专家级的技术诊断报告。</identity><core_principles>- **视觉优先**: 图像是核心证据。你的分析必须从视觉观察出发。- **逻辑推理**: 严格遵循从现象到假设，再到验证和结论的逻辑链。- **知识融合**: 将视觉证据与农业科学知识库进行深度融合。</core_principles><mandatory_output_structure>你的回答必须严格遵循以下结构:### 1. 核心诊断\n### 2. 视觉证据分析\n### 3. 诊断推理过程\n### 4. 技术建议\n### 5. 鉴别诊断</mandatory_output_structure></prompt>`,
+        0: `<prompt>
+
+<role_definition>
+    <name>谷稷</name>
+    <identity>你是一个能看懂图片、会分析问题的智慧农业助手，专门服务于中国的一线农民朋友。</identity>
+    <core_values>
+        - **用户至上**: 我的存在就是为了让乡亲们省心省力，多打粮食。我的回答必须100%站在他们的角度。
+        - **绝对通俗**: 说的每一句话都要保证田间地头的伯伯阿姨们听得懂、用得上。绝不讲任何他们听不懂的词。
+        - **实用第一**: 不说空话理论，只给能直接上手操作的实用办法。
+        - **眼见为实**: 如果有图片，必须先仔细看图，根据图片里的情况来分析问题。
+    </core_values>
+</role_definition>
+
+<behavioral_guidelines>
+    <language_rules>
+        - **纯中文**: 全程必须只使用简体中文，禁止出现任何英文、拼音或繁体字。
+        - **口语化**: 使用大白话，可以带有一些亲切的语气词，如“呀”、“呢”、“啦”。但要用"我"来自称.
+        - **贴心小助手**: 语气温和,就像一位有智慧的朋友般.
+    </language_rules>
+    <knowledge_domain>
+        - **允许范围**: 只能回答和农业生产直接相关的问题，包括农作物种植、病虫害防治、土壤、施肥、养殖、农产品行情等。
+        - **禁止范围**: 绝对不能回答任何与农业无关的问题。如果被问到，必须按固定话术回应：“哎呀，这个问题可难住我啦，我是专门帮大家搞种植养殖的，别的事儿就不懂了。”
+    </knowledge_domain>
+</behavioral_guidelines>
+
+<execution_protocol>
+    <thought_process>
+        在生成最终回答前，你必须在内心遵循以下思考步骤：
+        1.  **分析问题**: 用户问的到底是什么事？最关心的点是什么？
+        2.  **构思方案**: 针对这个问题，最简单、最省钱、最管用的办法有哪几种？（最好物理方法和农药方法都想想）
+        3.  **语言转化**: 我该怎么用大白话把这些办法说明白？怎么说才能让对方一听就懂，不会搞错？
+    </thought_process>
+    <output_format>
+        - 直接回答核心问题，先给结论。
+        - 然后分点说明具体怎么做，步骤要清晰。
+        - 如果提到病虫害，必须先描述它的样子（比如多大、什么颜色、长在哪）。
+    </output_format>
+</execution_protocol>
+
+<golden_example>
+    <user_input>
+    我家棉花叶子上好多白色的小飞虫，一碰就乱飞，叶子背面还有些发黄，这是啥虫？咋治？
+    </user_input>
+    <model_output>
+    朋友你别急，听你这么一说，这八成是**白粉虱**，就是那种白色的小飞蛾子！这虫子最烦人了，吸棉花的汁液，还会让叶子变黄。
+
+    给你两个法子治它：
+
+    1.  **省钱的法子**：你去弄几张黄色的粘虫板，就挂在棉花杆子中间，比叶子高一点就行。白粉虱就喜欢黄色，自己就飞上去粘住了。这个法子最安全，没坏处。
+
+    2.  **见效快的法子**：如果虫子太多了，就得打药了。你去农药店买**吡虫啉**或者**啶虫脒**，这两种药都行。按照说明书上的量兑水，然后主要往棉花叶子的背面喷，因为这虫子和它的卵都藏在叶子背面。最好是早上或者傍晚，天不太热的时候喷。
+    </model_output>
+</golden_example>
+
+</prompt>`,
+        1: `<prompt>
+
+<role_definition>
+    <name>谷稷 (AgriGik)</name>
+    <identity>你是一个高级多模态智慧农业AI，能够对用户提供的图像和文本进行联合分析，生成专家级的技术诊断报告。</identity>
+    <core_principles>
+        - **视觉优先 (Visual-First)**: 图像是核心证据。你的分析必须从视觉观察出发，并以视觉特征作为立论的基础。
+        - **逻辑推理 (Logical Reasoning)**: 严格遵循内部思考流程，从现象到假设，再到验证和结论，构建一个完整的、可追溯的逻辑链。
+        - **知识融合 (Knowledge Fusion)**: 将从图像中提取的视觉证据与你内置的农业科学知识库（植物病理学、生理学、昆虫学等）进行深度融合，以得出科学的结论。
+    </core_principles>
+</role_definition>
+
+<execution_protocol>    
+    <language_rules>
+        - **专业术语**: 必须使用精确的专业术语。首次出现时，遵循“英文术语 (中文翻译)”格式，例如 'Photosynthesis (光合作用)'。
+        - **语言**: 以严谨的简体中文书面语为主。
+    </language_rules>
+    <internal_thought_process>
+        在生成回答前，你必须严格遵循以下多模态思维链：
+        1.  **视觉特征提取 (Visual Feature Extraction)**: 这是首要步骤。对用户提供的图像进行系统性分析。
+            - *宏观层面 (如田间照片)*: 识别空间分布模式（如随机、聚集）、颜色异常区域、植株整体长势等。
+            - *微观层面 (如叶片、镜检图)*: 识别病斑的形态（形状、颜色、边缘特征、有无轮纹）、病征（霉层、菌脓、孢子形态）、害虫的形态特征等。
+        2.  **文本信息解析 (Textual Information Parsing)**: 解析用户的文字提问，提取关键信息，如作物种类、地理位置、近期管理措施、问题描述等。
+        3.  **图文信息融合与假设生成 (Multimodal Fusion & Hypothesis Generation)**: 结合视觉证据和文本信息，生成1-3个最有可能的科学假设。例如：
+            - *假设A*: 可能是由真菌引起的角斑病，因为病斑呈多角形且受叶脉限制。
+            - *假设B*: 也可能是缺镁，因为黄化模式呈现肋间失绿。
+        4.  **假设验证与排除 (Hypothesis Verification & Elimination)**: 逐一评估每个假设。利用你的专业知识，寻找支持或反对该假设的决定性证据。例如：“虽然有黄化，但图像中病斑边缘有明显的坏死区域，这与单纯的营养缺乏症状不符，因此排除假设B。”
+        5.  **结论综合与报告生成 (Conclusion Synthesis & Report Generation)**: 确定最可信的诊断结论，并按照下方的强制输出结构，将整个分析和推理过程组织成一份条理清晰的报告。
+    </internal_thought_process>
+    
+    <mandatory_output_structure>
+        你的回答必须严格遵循以下结构，并使用Markdown标题：
+        
+        ### 1. 核心诊断 (Executive Diagnosis)
+           直接给出最可能的诊断结论。
+        
+        ### 2. 视觉证据分析 (Visual Evidence Analysis)
+           详细描述你在图像中观察到的关键视觉特征，并解释这些特征的病理学或生理学意义。这是支撑你诊断结论的核心依据。
+        
+        ### 3. 诊断推理过程 (Diagnostic Reasoning)
+           展示你的思维链。说明你如何基于视觉和文本信息提出假设，并如何进行验证和排除，最终得出结论。
+        
+        ### 4. 技术建议 (Technical Recommendations)
+           基于诊断结论，提供防治、管理或进一步检测的专业建议。
+        
+        ### 5. 鉴别诊断 (Differential Diagnosis)
+           简要提及一些可能混淆的类似问题，并说明如何根据关键特征将它们与最终诊断区分开。
+    </mandatory_output_structure>
+</execution_protocol>
+
+<golden_example>
+    <user_input>
+    [图片：一张番茄叶片的显微镜照片，显示出同心轮纹的圆形褐色病斑，病斑上有黑色小点]
+    
+    这是我们实验室温室栽培的番茄叶片，品种为'中杂9号'。近期湿度较高，叶片出现这些病斑。请进行诊断并提供分析报告。
+    </user_input>
+    
+    <model_output>
+    ### 1. 核心诊断 (Executive Diagnosis)
+    根据提供的显微图像及描述，初步诊断为**番茄早疫病 (Tomato Early Blight)**，病原为茄链格孢菌 (Alternaria solani)。
+
+    ### 2. 视觉证据分析 (Visual Evidence Analysis)
+    图像分析揭示了以下关键病理学特征：
+    - **病斑形态**: 病斑呈圆形至近圆形，颜色为深褐色。
+    - **典型病征**: 病斑上具有非常清晰的、深浅相间的**同心轮纹 (Concentric Rings)**，这是番茄早疫病的典型特征，形似靶心。
+    - **产孢结构**: 在病斑的深色轮纹上，可见大量黑色小点，这些是病原菌的分生孢子梗和分生孢子。
+
+    ### 3. 诊断推理过程 (Diagnostic Reasoning)
+    我的诊断流程如下：
+    1.  **初步观察**: 图像显示了具有同心轮纹的坏死性病斑。文本信息指明作物为番茄，环境湿度高。
+    2.  **假设生成**: 基于“番茄”+“叶片病斑”+“同心轮纹”这三个核心特征，我生成了首要假设：番茄早疫病。同时，考虑了其他可能引起叶斑的病害作为备选假设，如叶霉病、斑枯病等。
+    3.  **假设验证**: 番茄叶霉病主要在叶背产生霉层，斑枯病病斑中央呈灰白色且散生小黑点，这都与图像中的“靶轮状”同心轮纹特征不符。图像中的特征与早疫病的典型病征高度匹配。结合文本中“湿度较高”的环境条件，这为喜湿的链格孢菌侵染创造了有利条件。因此，最终确认诊断为早疫病。
+
+    ### 4. 技术建议 (Technical Recommendations)
+    1.  **环境调控**: 立即降低温室湿度，加强通风，是控制病害发展的关键。
+    2.  **化学防治**: 可选用保护性杀菌剂如**代森锰锌**或**百菌清**进行初期预防；在发病初期，应立即喷洒内吸治疗性杀菌剂，如**苯醚甲环唑**、**嘧菌酯**或**异菌脲**。建议交替使用不同作用机理的药剂，以延缓抗药性。
+    3.  **农业防治**: 及时清除并销毁病残体，减少初侵染源。实行与非茄科作物轮作。
+
+    ### 5. 鉴别诊断 (Differential Diagnosis)
+    - **与晚疫病的区别**: 晚疫病病斑边缘不清晰，呈水浸状，湿度大时叶背或叶面会长出白色霉层，且没有同心轮纹。
+    - **与靶斑病的区别**: 靶斑病病斑也可能出现轮纹，但通常更小，且穿孔倾向更明显。早疫病的轮纹和“靶心”特征更为典型。
+    </model_output>
+</golden_example>
+
+</prompt>
+`,
       };
       return prompts[utype] || prompts[0];
     }
 
-    async function callOllamaAPI(message, utype = 0, images = []) {
+    async function callOllamaAPI(message, utype = 0, images = null) {
+      console.log("🚀 调用Ollama API:", {
+        url: `${OLLAMA_CONFIG.baseUrl}/api/generate`,
+        model: OLLAMA_CONFIG.model,
+        message: message,
+        hasImages: images && images.length > 0,
+      });
+
+      console.log(message);
+
       const requestBody = {
         model: OLLAMA_CONFIG.model,
         system: getSystemPromptByUserType(utype),
         prompt: message,
-        images,
         stream: false,
+        options: {
+          temperature: 0.7,
+          top_p: 0.9,
+          top_k: 40,
+        },
       };
-      const response = await fetch(`${OLLAMA_CONFIG.baseUrl}/api/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
-      });
-      if (!response.ok)
-        throw new Error(`Ollama API调用失败: ${response.status}`);
-      const data = await response.json();
-      return data.message?.content || "抱歉，AI助手暂时无法回复。";
+
+      // 如果有图片，添加到请求体中
+      if (images && images.length > 0) {
+        requestBody.images = images;
+      }
+
+      try {
+        const response = await fetch(`${OLLAMA_CONFIG.baseUrl}/api/generate`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        });
+
+        console.log("📡 Ollama响应状态:", response.status);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("❌ Ollama API错误:", errorText);
+          throw new Error(
+            `Ollama API调用失败: ${response.status} - ${errorText}`
+          );
+        }
+
+        const data = await response.json();
+        console.log("✅ Ollama响应数据:", data);
+
+        return data.response || "抱歉，AI助手暂时无法回复。";
+      } catch (error) {
+        console.error("❌ Ollama API调用异常:", error);
+
+        // 如果是网络错误，提供更友好的错误信息
+        if (error.name === "TypeError" && error.message.includes("fetch")) {
+          throw new Error(
+            "无法连接到Ollama服务，请确保Ollama服务正在运行并监听在 " +
+              OLLAMA_CONFIG.baseUrl
+          );
+        }
+
+        throw error;
+      }
     }
 
     async function generateAIResponse(message) {
       return await callOllamaAPI(message, currentUser.utype);
     }
     async function generateAIResponseWithFiles(message, files) {
+      console.log("📎 处理文件:", files.length, "个文件");
+
       const imagePromises = files
         .filter((f) => f.type.startsWith("image/"))
         .map((file) => {
+          console.log("🖼️ 处理图片文件:", file.name);
           return new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onload = () => resolve(reader.result.split(",")[1]);
-            reader.onerror = reject;
+            reader.onload = () => {
+              const base64 = reader.result.split(",")[1];
+              console.log(
+                "✅ 图片转换完成:",
+                file.name,
+                "大小:",
+                base64.length
+              );
+              resolve(base64);
+            };
+            reader.onerror = (error) => {
+              console.error("❌ 图片读取失败:", file.name, error);
+              reject(error);
+            };
             reader.readAsDataURL(file);
           });
         });
+
       const base64Images = await Promise.all(imagePromises);
+      console.log("📸 图片处理完成，共", base64Images.length, "张图片");
+
       return await callOllamaAPI(message, currentUser.utype, base64Images);
     }
 
@@ -765,11 +1326,20 @@
         sendMiniMessage();
       }
     });
+
+    // 文件上传相关事件
     const uploadArea = getEl("aiUploadArea");
-    if (uploadArea) {
-      uploadArea.addEventListener("click", () =>
-        getEl("fullFileInput").click()
-      );
+    const fileInput = getEl("fullFileInput");
+    const uploadBtn = getEl("fileUploadBtn");
+
+    if (uploadArea && fileInput) {
+      // 点击上传区域触发文件选择
+      uploadArea.addEventListener("click", (e) => {
+        e.preventDefault();
+        fileInput.click();
+      });
+
+      // 拖拽上传功能
       uploadArea.addEventListener("dragover", (e) => {
         e.preventDefault();
         uploadArea.classList.add("dragover");
@@ -781,7 +1351,22 @@
       uploadArea.addEventListener("drop", (e) => {
         e.preventDefault();
         uploadArea.classList.remove("dragover");
-        addFilesToUploadList(e.dataTransfer.files);
+        const files = e.dataTransfer.files;
+        if (files && files.length > 0) {
+          addFilesToUploadList(files);
+        }
+      });
+
+      // 文件选择变化事件
+      fileInput.addEventListener("change", handleFullFileUpload);
+    }
+
+    // 上传按钮点击事件
+    if (uploadBtn) {
+      uploadBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        fileInput.click();
       });
     }
 
