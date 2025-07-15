@@ -3,6 +3,8 @@ Google Drive: [Fine-tune model](https://drive.google.com/drive/folders/1mTs7oXLj
 
 there are also some problems for models running on Ollama,here's the [issue](https://github.com/ollama/ollama/issues/11426#event-18630548498) by me.
 
+Also,for the final defense of this "weird" project,i turn to **Prompt Engineering**.And i have to admit that there is so many interesting stuffs:)
+
 ## Datasets
 - [IP102](https://github.com/xpwu95/IP102)
 - agriculture_wiki_qa (from Modelscope)
