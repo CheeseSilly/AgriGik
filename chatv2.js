@@ -1,32 +1,33 @@
 /**
  * AI Assistant Plugin v1.0
  *
- * 使用方法:
- * 1. 将此文件保存为 ai-plugin.js
- * 2. 在您想集成的HTML页面中添加 <script src="path/to/ai-plugin.js" defer></script>
- * 3. (可选) 通过在页面中定义 window.AI_PLUGIN_CONFIG 对象来覆盖默认配置。
+ * Usage:
+ * 1. Save this file as ai-plugin.js
+ * 2. Add <script src="path/to/ai-plugin.js" defer></script> to the HTML page where you want to integrate it
+ * 3. (Optional) Override default configuration by defining window.AI_PLUGIN_CONFIG object in the page.
  */
 (function () {
-  // --- 1. 防止插件被重复加载 ---
+  // --- 1. Prevent plugin from being loaded multiple times ---
   if (document.getElementById("aiAssistantWidgetContainer")) {
-    console.warn("AI 助手插件已经加载。");
+    console.warn("AgriGik已经加载。");
     return;
   }
 
-  // --- 2. 默认配置 ---
+  // --- 2. Default configuration ---
   const defaultConfig = {
     ollamaBaseUrl: "http://localhost:11434",
     ollamaModel: "AgriGik",
+    apiUrl: "http://127.0.0.1:5000",
     lucideIconUrl: "https://unpkg.com/lucide@latest/dist/umd/lucide.js",
   };
 
-  // 合并用户在 window.AI_PLUGIN_CONFIG 中提供的自定义配置
+  // --- 3. Merge user configuration ---
   const userConfig = window.AI_PLUGIN_CONFIG || {};
   const config = { ...defaultConfig, ...userConfig };
 
-  // --- 3. 定义插件的CSS样式 (来自 styles.css) ---
+  // --- 4. Define plugin CSS styles (from styles.css) ---
   const widgetCSS = `
-    /* CSS 变量定义 */
+    /* CSS Variable Definitions */
     :root {
       --bg-primary: linear-gradient(135deg, #f2fffb 0%, #14b8a6 100%);
       --bg-secondary: rgba(255, 255, 255, 0.95);
@@ -58,14 +59,14 @@
     .btn-danger { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3); }
     .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(231, 76, 60, 0.5); background: linear-gradient(135deg, #c0392b 0%, #a93226 100%); }
     .btn-sm { padding: 8px 16px; font-size: 12px; border-radius: 8px; }
-    .btn-floating { position: fixed; bottom: 24px; right: 24px; height: 56px; min-width: 56px; padding: 0 20px; border-radius: 28px; background: linear-gradient(135deg, #1f2937 0%, #374151 100%); color: white; border: none; cursor: pointer; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2); transition: all 0.3s ease; z-index: 9999; display: flex; align-items: center; justify-content: center; gap: 12px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 500; font-size: 14px; overflow: hidden; backdrop-filter: blur(10px); }
+    .btn-floating { position: fixed; bottom: 0px; right: 24px; height: 56px; min-width: 56px; padding: 0 20px; border-radius: 28px; background: rgba(31, 41, 55, 0.3); color: white; border: 1px solid rgba(255, 255, 255, 0.1); cursor: pointer; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); transition: all 0.3s ease; z-index: 9999; display: flex; align-items: center; justify-content: center; gap: 12px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 500; font-size: 14px; overflow: hidden; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
     .btn-full-width { width: 100%; }
     .floating-content { display: flex; align-items: center; justify-content: center; gap: 10px; position: relative; z-index: 10; }
     .floating-icon { width: 20px; height: 20px; filter: brightness(0) invert(1); flex-shrink: 0; }
     .floating-text { font-weight: 600; letter-spacing: 0.025em; white-space: nowrap; }
-    .btn-floating:hover { transform: scale(1.05); box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3); background: linear-gradient(135deg, #374151 0%, #4b5563 100%); }
+    .btn-floating:hover { transform: scale(1.05); box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25); background: rgba(55, 65, 81, 0.4); border-color: rgba(255, 255, 255, 0.2); }
     .btn-floating.active { transform: scale(0.95); }
-    .pulse-ring { position: absolute; width: 100%; height: 100%; border-radius: 28px; background: rgba(31, 41, 55, 0.3); animation: pulse-ring-anim 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
+    .pulse-ring { position: absolute; width: 100%; height: 100%; border-radius: 28px; background: rgba(16, 185, 129, 0.2); animation: pulse-ring-anim 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
     @keyframes pulse-ring-anim { 0% { transform: scale(0.8); opacity: 1; } 80% { transform: scale(1.4); opacity: 0; } 100% { transform: scale(1.4); opacity: 0; } }
     .chat-container { position: fixed; bottom: 100px; right: 24px; width: 380px; height: 500px; background: var(--bg-secondary); backdrop-filter: blur(20px); border-radius: 20px; border: 1px solid var(--border-color); box-shadow: 0 20px 40px var(--shadow-color); display: flex; flex-direction: column; overflow: hidden; opacity: 0; transform: translateY(20px) scale(0.9); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; z-index: 9998;}
     .chat-container.active { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
@@ -88,7 +89,7 @@
     .message.user .message-content { background: #e5e7eb; color: #374151; border-radius: 18px; }
     .message.ai .message-content { background: #f8f9fa; color: #2d3748; border-bottom-left-radius: 4px; }
     
-    /* 消息内容优化 */
+    /* Message Content Optimization */
     .message-content > p:first-child { margin-top: 0; }
     .message-content > p:last-child { margin-bottom: 0; }
     .message-content > *:first-child { margin-top: 0; }
@@ -106,7 +107,11 @@
     .fullscreen-content { flex: 1; display: flex; overflow: hidden; }
     .sidebar { width: 280px; background: white; border-right: 1px solid rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; transition: all 0.3s ease; }
     .sidebar.hidden { width: 0; overflow: hidden; }
-    .sidebar-header { padding: 16px; border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+    .sidebar-header { 
+      padding: 16px; 
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+      background: rgba(255, 255, 255, 0.05);
+    }
     .sidebar-header-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
     .sidebar-content { flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 4px; }
     .sidebar-content::-webkit-scrollbar { width: 6px; }
@@ -173,7 +178,7 @@
     @keyframes loading-bounce-anim { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
     .hidden { display: none !important; }
     
-    /* Markdown样式 */
+    /* Markdown Styles */
     .ai-code-block {
       background: #f6f8fa;
       border: 1px solid #e1e5e9;
@@ -264,7 +269,7 @@
       margin: 16px 0;
     }
     
-    /* 代码块语法高亮 */
+    /* language-support */
     .language-javascript, .language-js {
       color: #d73a49;
     }
@@ -288,13 +293,13 @@
     @media (max-width: 768px) { .sidebar { width: 260px; } .main-messages { padding: 20px; } }
     `;
 
-  // --- 4. 定义插件的HTML结构 (来自 chatv2.html) ---
+  // --- 5. Define plugin HTML structure (from chatv2.html) ---
   const widgetHTML = `
       <div class="ai-assistant-widget">
         <button id="aiButton" onclick="toggleMiniChat()" class="btn-floating">
           <div class="pulse-ring"></div>
           <div class="floating-content">
-            <img class="floating-icon" src="chat-ui-svgrepo-com.svg" alt="Chat Icon"/>
+            <img class="floating-icon" src="/static/img/chat-ui-svgrepo-com.svg" alt="Chat Icon"/>
             <span class="floating-text">问AI</span>
           </div>
           <div id="aiBadge" class="notification-badge hidden">1</div>
@@ -302,7 +307,7 @@
         <div id="aiMiniChat" class="chat-container">
           <div class="chat-header">
             <div class="chat-title">
-              <img class="icon-avatar" src="crops4.svg" alt="AgriGik"/>
+              <img class="icon-avatar" src="/static/img/crops4.svg" alt="AgriGik"/>
               AgriGik
             </div>
             <div class="chat-actions">
@@ -311,7 +316,7 @@
             </div>
           </div>
           <div id="aiMiniMessages" class="chat-messages">
-            <div class="message ai"><div class="message-avatar ai"><img class="icon-avatar" src="chat-ui-svgrepo-com.svg" alt="AgriGik"/></div><div class="message-content">👋 您好！我是谷稷，有什么可以帮助您的吗？</div></div>
+            <div class="message ai"><div class="message-avatar ai"><img class="icon-avatar" src="/static/img/chat-ui-svgrepo-com.svg" alt="AgriGik"/></div><div class="message-content">👋 您好！我是谷稷，有什么可以帮助您的吗？</div></div>
             <div class="mini-example-questions" id="miniExampleQuestions">
               <div class="mini-questions-header"><span>农业问题咨询</span></div>
               <div class="mini-questions-list">
@@ -332,10 +337,10 @@
       <div id="aiModal" class="fullscreen-modal">
         <div class="fullscreen-header">
           <div class="fullscreen-title">
-          <img class="icon-avatar" src="crops4.svg" alt="AgriGik"/>
+          <img class="icon-avatar" src="/static/img/crops4.svg" alt="AgriGik"/>
           AgriGik</div>
           <div class="fullscreen-actions">
-            <button onclick="handleHeaderButtonClick(event, 'toggleSidebar')" class="btn btn-secondary"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9,22 9,12 15,12 15,22" /></svg>历史记录</button>
+            <button onclick="handleHeaderButtonClick(event, 'toggleSidebar')" class="btn btn-secondary"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="9,22 9,12 15,12 15,22" /></svg>历史记录</button>
             <button onclick="handleHeaderButtonClick(event, 'exportAllHistory')" class="btn btn-secondary"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7,10 12,15 17,10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>导出历史</button>
             <button onclick="handleHeaderButtonClick(event, 'closeFullscreen')" class="btn btn-secondary" type="button"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>关闭</button>
           </div>
@@ -353,7 +358,7 @@
           <div class="main-chat">
             <div id="aiFullMessages" class="main-messages">
               <div class="message ai">
-                  <div class="message-avatar ai"><img class="icon-avatar" src="chat-ui-svgrepo-com.svg" alt="AgriGik"/></div>
+                  <div class="message-avatar ai"><img class="icon-avatar" src="/static/img/chat-ui-svgrepo-com.svg" alt="AgriGik"/></div>
                   <div class="message-content">👋 我是谷稷！我可以帮助您解答问题、分析文档、进行创意思考等。请随时向我提问。</div>
               </div>
               <div class="example-questions" id="exampleQuestions">
@@ -386,105 +391,317 @@
       </div>
     `;
 
-  // --- 5. 注入CSS, HTML和外部依赖的函数 ---
+  // --- 6. Inject CSS, HTML and external dependencies ---
   function initializePlugin() {
-    // 注入CSS
+    // Inject CSS
     const styleElement = document.createElement("style");
     styleElement.id = "ai-assistant-plugin-styles";
     styleElement.textContent = widgetCSS;
     document.head.appendChild(styleElement);
 
-    // 注入HTML
+    // Inject HTML
     const widgetContainer = document.createElement("div");
     widgetContainer.id = "aiAssistantWidgetContainer";
     widgetContainer.innerHTML = widgetHTML;
     document.body.appendChild(widgetContainer);
 
-    // 注入Lucide图标库
+    // Inject Lucide icon library
     const lucideScript = document.createElement("script");
     lucideScript.src = config.lucideIconUrl;
     lucideScript.onload = () => {
       console.log("AI 助手: Lucide 图标库加载成功。");
-      // 依赖加载后, 运行主逻辑
+      // After dependencies are loaded, run main logic
       runAiLogic();
     };
     lucideScript.onerror = () => {
       console.error("AI 助手: Lucide 图标库加载失败，部分图标可能无法显示。");
-      // 即使图标加载失败, 也尝试运行主逻辑
+      // Even if icon loading fails, try to run main logic
       runAiLogic();
     };
     document.head.appendChild(lucideScript);
   }
 
-  // --- 6. 插件的核心JavaScript逻辑 ---
+  // --- 7. Core JavaScript logic of the plugin ---
   function runAiLogic() {
-    // 使用在第2步中定义的配置
+    // Use configuration defined in step 2
     const OLLAMA_CONFIG = {
       baseUrl: config.ollamaBaseUrl,
       model: config.ollamaModel,
     };
 
-    // --- 核心逻辑---
+    // --- Core Logic ---
 
-    // 状态变量
+    // State variables
     let isMiniChatOpen = false;
     let isFullscreenOpen = false;
     let isSidebarOpen = true;
-    let currentUser = { uid: 0, utype: 0, uname: "Root" };
-    let chatHistory = [];
-    let currentSessionId = null;
     let currentFiles = [];
+    const API_URL = config.apiUrl;
+    let currentUser = null;
+    let currentSessionId = null;
+    let chatHistory = {}; // Changed to object storage, grouped by session_id
 
-    // DOM元素获取
+    // DOM element retrieval
     const getEl = (id) => document.getElementById(id);
 
-    // 用户管理
+    // User management
+    /**
+     * 设置当前用户
+     * @param {number} uid - 用户ID
+     * @param {number} utype - 用户类型 (对应数据库的anth字段)
+     * @param {string} uname - 用户名 (对应数据库的username字段)
+     */
     async function setCurrentUser(uid, utype = 0, uname = null) {
       currentUser = { uid, utype, uname };
-      localStorage.setItem("currentUser", JSON.stringify(currentUser));
-      await loadUserChatHistory();
       console.log("当前用户:", currentUser);
-      return currentUser;
+      await loadUserChatHistory();
     }
 
-    function getUserStorageKey() {
-      return `aiChatHistory_${currentUser.uid}`;
-    }
-
-    async function loadUserChatHistory() {
-      try {
-        const historyData = localStorage.getItem(getUserStorageKey());
-        chatHistory = historyData ? JSON.parse(historyData) : [];
-      } catch (error) {
-        console.error("加载用户历史记录失败:", error);
-        chatHistory = [];
-      }
-    }
-
-    function saveUserChatHistory() {
-      try {
-        localStorage.setItem(getUserStorageKey(), JSON.stringify(chatHistory));
-      } catch (error) {
-        console.error("保存用户历史记录失败:", error);
-      }
-    }
-
+    /**
+     * 从后端获取用户信息并初始化
+     * 需要根据实际的用户认证方式来获取用户ID
+     */
     async function initializeUser() {
       try {
-        const savedUser = localStorage.getItem("currentUser");
-        if (savedUser) {
-          currentUser = JSON.parse(savedUser);
-          await loadUserChatHistory();
-        } else {
-          await setCurrentUser("default_user", 0, "访客");
+        // Try to get current user info (based on session)
+        const response = await fetch(`${API_URL}/current_user`, {
+          method: "GET",
+          credentials: "same-origin", // Ensure sending cookies/session
+        });
+
+        // Check response status
+        if (!response.ok) {
+          if (response.status === 401) {
+            console.log("用户未登录，使用默认用户配置");
+            // User not logged in, use default user configuration
+            await setCurrentUser(1, 0, "访客用户");
+            return;
+          }
+          const errorText = await response.text();
+          console.error("获取用户信息失败:", response.status, errorText);
+          throw new Error(
+            `获取用户信息失败: ${response.status} - ${errorText}`
+          );
         }
+
+        // Check response content type
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          const responseText = await response.text();
+          console.error("服务器返回非JSON格式:", responseText);
+          throw new Error("服务器返回了非JSON格式的数据");
+        }
+
+        const userData = await response.json();
+        console.log("用户数据:", userData);
+
+        // Validate returned data structure
+        if (!userData || typeof userData !== "object") {
+          throw new Error("服务器返回的用户数据格式不正确");
+        }
+
+        if (userData.status === "error") {
+          throw new Error(userData.message || "获取用户信息失败");
+        }
+
+        // Use data from backend to set current user
+        await setCurrentUser(
+          userData["uid"],
+          userData["utype"],
+          userData["username"]
+        );
+
+        console.log("用户初始化成功:", {
+          uid: userData["uid"],
+          utype: userData["utype"],
+          username: userData["username"],
+        });
       } catch (error) {
         console.error("用户初始化失败:", error);
-        await setCurrentUser("default_user", 0, "访客");
+        // If user initialization fails, use default user or prompt user to login again
+        console.warn("使用默认用户配置继续运行");
+        await setCurrentUser(1, 0, "Guest User"); // Set default user
       }
     }
 
-    // 主题切换
+    // function getUserStorageKey() {
+    //   return `aiChatHistory_${currentUser.uid}`;
+    // }
+
+    /**
+     * 从后端加载用户的聊天历史记录
+     */
+    async function loadUserChatHistory() {
+      if (!currentUser || !currentUser.uid) {
+        console.log("No valid user, cannot load history.");
+        chatHistory = {};
+        loadChatHistory(); // Render empty list
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${API_URL}/users/${currentUser.uid}/history`,
+          {
+            credentials: "same-origin", // Ensure sending session info
+          }
+        );
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        const messages = await response.json();
+
+        // Process flat message list into grouped structure by session_id
+        const historyGroups = {};
+        for (const msg of messages) {
+          const session_id = msg.session_id;
+          if (!historyGroups[session_id]) {
+            historyGroups[session_id] = {
+              id: session_id,
+              messages: [],
+              timestamp: 0,
+              title: "新对话",
+            };
+          }
+
+          // Parse message content
+          let messageData;
+          try {
+            messageData = JSON.parse(msg.message);
+          } catch (e) {
+            // If parsing fails, create basic message structure
+            messageData = {
+              role: "user",
+              content: msg.message,
+              timestamp: new Date(msg.created_at).getTime(),
+            };
+          }
+
+          historyGroups[session_id].messages.push(messageData);
+
+          // Update session title and timestamp
+          const msgTimestamp = new Date(msg.created_at).getTime();
+          if (msgTimestamp > historyGroups[session_id].timestamp) {
+            historyGroups[session_id].timestamp = msgTimestamp;
+          }
+
+          // Use first user message as title
+          if (
+            historyGroups[session_id].title === "新对话" &&
+            messageData.role === "user"
+          ) {
+            historyGroups[session_id].title =
+              messageData.content.substring(0, 30) + "...";
+          }
+        }
+
+        chatHistory = historyGroups;
+        loadChatHistory(); // Render sidebar with processed data
+
+        // Auto-load the latest session
+        const sessionIds = Object.keys(chatHistory);
+        if (sessionIds.length > 0) {
+          const latestSessionId = sessionIds.sort(
+            (a, b) => chatHistory[b].timestamp - chatHistory[a].timestamp
+          )[0];
+          loadSessionById(latestSessionId);
+        } else {
+          startNewChat();
+        }
+      } catch (error) {
+        console.error("Failed to load user history:", error);
+        chatHistory = {};
+        loadChatHistory(); // Render empty list
+      }
+    }
+
+    /**
+     * Save a single message to backend database
+     * @param {object} messageObject - Message object, e.g. { role: 'user', content: 'Hello', timestamp: 1234567890 }
+     */
+    async function saveMessageToBackend(messageObject) {
+      console.log(currentUser, currentUser.uid, currentSessionId);
+      if (!currentUser || !currentUser.uid || !currentSessionId) {
+        console.warn("无法保存消息：缺少用户信息或会话ID");
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${API_URL}/users/${currentUser.uid}/history`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "same-origin",
+            body: JSON.stringify({
+              session_id: currentSessionId,
+              message: JSON.stringify(messageObject), // Convert message object to JSON string for storage
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const savedMessage = await response.json();
+        console.log("消息已保存到后端:", savedMessage);
+
+        // Immediately update local history
+        updateLocalChatHistory(messageObject);
+
+        // Update history display
+        updateHistoryDisplay();
+      } catch (error) {
+        console.error("保存消息到后端失败:", error);
+      }
+    }
+
+    /**
+     * 更新本地历史记录缓存
+     * @param {object} messageObject - 消息对象
+     */
+    function updateLocalChatHistory(messageObject) {
+      if (!currentSessionId) return;
+
+      // If current session doesn't exist in history, create it
+      if (!chatHistory[currentSessionId]) {
+        chatHistory[currentSessionId] = {
+          id: currentSessionId,
+          messages: [],
+          timestamp: Date.now(),
+          title: "新对话",
+        };
+      }
+
+      // Add message to current session
+      chatHistory[currentSessionId].messages.push(messageObject);
+
+      // Update session timestamp
+      chatHistory[currentSessionId].timestamp = messageObject.timestamp;
+
+      // If it's a user message and current session title is still default, update title
+      if (
+        messageObject.role === "user" &&
+        chatHistory[currentSessionId].title === "新对话"
+      ) {
+        chatHistory[currentSessionId].title =
+          messageObject.content.substring(0, 30) + "...";
+      }
+    }
+
+    /**
+     * 更新历史记录显示
+     */
+    function updateHistoryDisplay() {
+      // Only update history display in fullscreen mode
+      if (isFullscreenOpen) {
+        loadChatHistory();
+        updateHistorySelection(currentSessionId);
+      }
+    }
+
+    // Theme toggle
     function initializeTheme() {
       const savedTheme = localStorage.getItem("theme") || "light";
       if (savedTheme === "dark") {
@@ -494,7 +711,7 @@
       }
     }
 
-    // UI 切换
+    // UI toggle
     window.toggleMiniChat = function () {
       isMiniChatOpen = !isMiniChatOpen;
       const miniChat = getEl("aiMiniChat");
@@ -513,7 +730,7 @@
       }
     };
 
-    //全屏
+    // Fullscreen
     window.openFullscreen = function () {
       isFullscreenOpen = true;
       getEl("aiModal").classList.add("active");
@@ -526,7 +743,6 @@
 
     window.closeFullscreen = function () {
       isFullscreenOpen = false;
-      saveCurrentSession();
       getEl("aiModal").classList.remove("active");
       document.body.style.overflow = "";
     };
@@ -536,7 +752,7 @@
       getEl("aiSidebar").classList.toggle("hidden", !isSidebarOpen);
     };
 
-    //处理按钮
+    // Handle buttons
     window.handleHeaderButtonClick = function (event, actionName) {
       event.stopPropagation();
       switch (actionName) {
@@ -552,13 +768,13 @@
       }
     };
 
-    // 消息处理
+    // Message handling
     window.sendFullMessage = async function () {
       const input = getEl("aiFullInput");
       const message = input.value.trim();
       if (!message && currentFiles.length === 0) return;
 
-      // 创建文件副本用于发送
+      // Create file copy for sending
       const filesToSend = [...currentFiles];
 
       if (message) {
@@ -577,12 +793,12 @@
         );
         hideTypingIndicator();
         addFullMessage(aiResponse, "ai");
-        saveCurrentSession();
+        // Message already saved to backend in addFullMessage
       } catch (error) {
         console.error("发送消息失败:", error);
         hideTypingIndicator();
 
-        // 根据错误类型提供不同的错误信息
+        // Provide different error messages based on error type
         let errorMessage = "抱歉，AI服务暂时不可用。";
         if (error.message.includes("无法连接到Ollama")) {
           errorMessage =
@@ -602,13 +818,22 @@
       const input = getEl("aiMiniInput");
       const message = input.value.trim();
       if (!message) return;
+
+      // If no current session, create a new session
+      if (!currentSessionId) {
+        currentSessionId = `session_${Date.now()}_${Math.random()
+          .toString(36)
+          .substr(2, 9)}`;
+        console.log("Mini chat创建新会话:", currentSessionId);
+      }
+
       getEl("miniExampleQuestions").style.display = "none";
       addMiniMessage(message, "user");
       input.value = "";
       try {
         const aiResponse = await generateAIResponse(message);
         addMiniMessage(aiResponse, "ai");
-        saveCurrentSession();
+        // Message already saved to backend in addMiniMessage
       } catch (error) {
         console.error("发送消息失败:", error);
         let errorMessage = "抱歉，AI服务暂时不可用。";
@@ -642,6 +867,14 @@
       container.appendChild(msgEl);
       scrollToBottom("aiFullMessages");
       lucide.createIcons();
+
+      // Save message to backend
+      const messageObject = {
+        role: sender,
+        content: content,
+        timestamp: Date.now(),
+      };
+      saveMessageToBackend(messageObject);
     }
 
     function addMiniMessage(content, sender) {
@@ -650,6 +883,14 @@
       container.appendChild(msgEl);
       scrollToBottom("aiMiniMessages");
       lucide.createIcons();
+
+      // Save message to backend
+      const messageObject = {
+        role: sender,
+        content: content,
+        timestamp: Date.now(),
+      };
+      saveMessageToBackend(messageObject);
     }
 
     function createMessageElement(content, sender, type) {
@@ -658,7 +899,7 @@
       const avatarIcon =
         sender === "user"
           ? `<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"></circle><path d="M5.5 21v-2.5c0-2.25 3.82-4.5 6.5-4.5s6.5 2.25 6.5 4.5V21"></path></svg>`
-          : `<img class="icon-avatar" src="chat-ui-svgrepo-com.svg" alt="AgriGik"/>`;
+          : `<img class="icon-avatar" src="/static/img/chat-ui-svgrepo-com.svg" alt="AgriGik"/>`;
 
       wrapper.innerHTML = `
                 <div class="message-avatar ${sender}">${avatarIcon}</div>
@@ -671,7 +912,7 @@
       const indicator = document.createElement("div");
       indicator.className = "message ai";
       indicator.id = "typingIndicator";
-      indicator.innerHTML = `<div class="message-avatar ai"><img class="icon-avatar" src="chat-ui-svgrepo-com.svg" alt="AgriGik"/></div><div class="message-content"><div class="loading-dots"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div></div>`;
+      indicator.innerHTML = `<div class="message-avatar ai"><img class="icon-avatar" src="/static/img/chat-ui-svgrepo-com.svg" alt="AgriGik"/></div><div class="message-content"><div class="loading-dots"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div></div>`;
       container.appendChild(indicator);
       scrollToBottom("aiFullMessages");
     }
@@ -680,12 +921,12 @@
       getEl("typingIndicator")?.remove();
     }
 
-    // 文件处理
+    // File handling
     window.handleFullFileUpload = function (event) {
       const files = event.target.files;
       if (files && files.length > 0) {
         addFilesToUploadList(files);
-        // 重置文件input以允许重复上传相同文件
+        // Reset file input to allow re-upload of same file
         event.target.value = "";
       }
     };
@@ -698,7 +939,7 @@
         fileDiv.className = "file-item";
         fileDiv.setAttribute("data-filename", file.name);
 
-        // 创建文件信息部分
+        // Create file info section
         const fileInfo = document.createElement("div");
         fileInfo.className = "file-info";
         fileInfo.innerHTML = `
@@ -709,7 +950,7 @@
           <span class="file-name">${file.name}</span>
         `;
 
-        // 创建删除按钮
+        // Create delete button
         const removeBtn = document.createElement("button");
         removeBtn.className = "file-remove";
         removeBtn.title = "删除文件";
@@ -720,7 +961,7 @@
           </svg>
         `;
 
-        // 绑定删除事件
+        // Bind delete event
         removeBtn.addEventListener("click", () => {
           removeFile(removeBtn, file.name);
         });
@@ -730,16 +971,16 @@
         container.appendChild(fileDiv);
       }
 
-      // 重新初始化图标
+      // Re-initialize icons
       if (window.lucide) {
         lucide.createIcons();
       }
     }
     window.removeFile = function (button, fileName) {
-      // 从文件数组中移除
+      // Remove from file array
       currentFiles = currentFiles.filter((f) => f.name !== fileName);
 
-      // 从DOM中移除文件项
+      // Remove file item from DOM
       const fileItem = button.closest(".file-item");
       if (fileItem) {
         fileItem.remove();
@@ -755,110 +996,235 @@
       addFullMessage(`📁 已上传文件: ${file.name}`, sender);
     }
 
-    // 会话管理
+    // Session management
     window.startNewChat = function () {
-      saveCurrentSession();
-      currentSessionId = Date.now();
+      // Generate new session ID
+      currentSessionId = `session_${Date.now()}_${Math.random()
+        .toString(36)
+        .substr(2, 9)}`;
+
+      // Clear interface
       clearUploadedFiles();
       getEl("aiFullMessages").innerHTML = getEl("exampleQuestions").outerHTML;
+
+      // Add welcome message
       const welcomeMsg = createMessageElement(
         "👋 您好！我是谷稷，有什么农业问题可以帮助您解答？",
         "ai"
       );
       getEl("aiFullMessages").prepend(welcomeMsg);
       lucide.createIcons();
-      loadChatHistory();
-    };
 
-    function saveCurrentSession() {
-      if (!currentSessionId) return;
-      const messagesContainer = getEl("aiFullMessages");
-      if (!messagesContainer || messagesContainer.children.length <= 1) return;
-      const firstUserMessage = messagesContainer.querySelector(
-        ".message.user .message-content"
-      );
-      const title = firstUserMessage
-        ? firstUserMessage.textContent.substring(0, 30) + "..."
-        : "新对话";
-      const session = {
-        id: currentSessionId,
-        title,
-        html: messagesContainer.innerHTML,
-        timestamp: Date.now(),
-      };
-      const index = chatHistory.findIndex((s) => s.id === currentSessionId);
-      if (index > -1) chatHistory[index] = session;
-      else chatHistory.unshift(session);
-      saveUserChatHistory();
-    }
-
-    window.loadSessionById = function (sessionId) {
-      const session = chatHistory.find((s) => s.id === sessionId);
-      if (session) {
-        currentSessionId = session.id;
-        getEl("aiFullMessages").innerHTML = session.html;
-        scrollToBottom("aiFullMessages");
-        lucide.createIcons();
-        updateHistorySelection(sessionId);
+      // Create history entry for new session
+      if (!chatHistory[currentSessionId]) {
+        chatHistory[currentSessionId] = {
+          id: currentSessionId,
+          messages: [],
+          timestamp: Date.now(),
+          title: "新对话",
+        };
       }
+
+      // 刷新历史记录列表
+      updateHistoryDisplay();
+
+      console.log("新会话已创建:", currentSessionId);
     };
 
+    /**
+     * 根据会话ID加载会话内容
+     * @param {string} sessionId - 会话ID
+     */
+    window.loadSessionById = function (sessionId) {
+      if (!chatHistory[sessionId]) {
+        console.error("会话不存在:", sessionId);
+        return;
+      }
+
+      const session = chatHistory[sessionId];
+      currentSessionId = sessionId;
+
+      // 清空当前消息容器
+      const container = getEl("aiFullMessages");
+      container.innerHTML = getEl("exampleQuestions").outerHTML;
+
+      // 重新渲染历史消息
+      session.messages.forEach((msg) => {
+        const msgEl = createMessageElement(msg.content, msg.role, "user");
+        container.appendChild(msgEl);
+      });
+
+      scrollToBottom("aiFullMessages");
+      lucide.createIcons();
+      updateHistorySelection(sessionId);
+
+      console.log("会话已加载:", sessionId);
+    };
+
+    /**
+     * 加载并显示聊天历史记录列表
+     */
     function loadChatHistory() {
       const container = getEl("aiHistoryList");
       container.innerHTML = "";
-      chatHistory
-        .sort((a, b) => b.timestamp - a.timestamp)
-        .forEach((session) => {
-          const item = document.createElement("div");
-          item.className = "history-item";
-          item.dataset.sessionId = session.id;
-          if (session.id === currentSessionId) item.classList.add("active");
-          item.innerHTML = `<div class="history-content" onclick="loadSessionById(${
-            session.id
-          })"><div class="history-title-row"><div class="history-title truncate">${
-            session.title
-          }</div></div><div class="history-date">${formatDate(
-            session.timestamp
-          )}</div></div><div class="history-actions"><button class="history-action-btn delete" onclick="event.stopPropagation(); deleteSession(${
-            session.id
-          })" title="删除"><svg class="w-3 h-3 icon" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"></polyline><path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path></svg></button></div>`;
-          container.appendChild(item);
-        });
-    }
 
-    function updateHistorySelection(sessionId) {
-      Array.from(getEl("aiHistoryList").children).forEach((item) => {
-        item.classList.toggle("active", item.dataset.sessionId == sessionId);
+      // 将chatHistory对象转换为数组并按时间戳排序
+      const sessions = Object.values(chatHistory).sort(
+        (a, b) => b.timestamp - a.timestamp
+      );
+
+      sessions.forEach((session) => {
+        const item = document.createElement("div");
+        item.className = "history-item";
+        item.dataset.sessionId = session.id;
+        if (session.id === currentSessionId) {
+          item.classList.add("active");
+        }
+
+        item.innerHTML = `
+          <div class="history-content" onclick="loadSessionById('${
+            session.id
+          }')">
+            <div class="history-title-row">
+              <div class="history-title truncate">${session.title}</div>
+            </div>
+            <div class="history-date">${formatDate(session.timestamp)}</div>
+          </div>
+          <div class="history-actions">
+            <button class="history-action-btn delete" 
+                    onclick="event.stopPropagation(); deleteSession('${
+                      session.id
+                    }')" 
+                    title="删除">
+              <svg class="w-3 h-3 icon" viewBox="0 0 24 24">
+                <polyline points="3,6 5,6 21,6"></polyline>
+                <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+              </svg>
+            </button>
+          </div>
+        `;
+
+        container.appendChild(item);
       });
     }
 
-    window.deleteSession = function (sessionId) {
+    /**
+     * 更新历史记录选中状态
+     * @param {string} sessionId - 会话ID
+     */
+    function updateHistorySelection(sessionId) {
+      Array.from(getEl("aiHistoryList").children).forEach((item) => {
+        item.classList.toggle("active", item.dataset.sessionId === sessionId);
+      });
+    }
+
+    /**
+     * 删除指定会话
+     * @param {string} sessionId - 会话ID
+     */
+    window.deleteSession = async function (sessionId) {
       if (!confirm("确定要删除这个对话吗？")) return;
-      if (sessionId === currentSessionId) {
-        currentSessionId = null;
-        startNewChat();
+
+      try {
+        // 从后端删除会话
+        const response = await fetch(
+          `${API_URL}/users/${currentUser.uid}/sessions/${sessionId}`,
+          {
+            method: "DELETE",
+            credentials: "same-origin",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        // 从本地缓存中删除
+        delete chatHistory[sessionId];
+
+        // 如果删除的是当前会话，创建新会话
+        if (sessionId === currentSessionId) {
+          currentSessionId = null;
+          startNewChat();
+        }
+
+        // 刷新历史记录列表
+        loadChatHistory();
+
+        console.log("会话已删除:", sessionId);
+      } catch (error) {
+        console.error("删除会话失败:", error);
+        alert("删除会话失败，请重试");
       }
-      chatHistory = chatHistory.filter((s) => s.id !== sessionId);
-      saveUserChatHistory();
-      loadChatHistory();
     };
 
-    window.clearAllHistory = function () {
-      if (!confirm("确定要清空所有历史记录吗？")) return;
-      chatHistory = [];
-      saveUserChatHistory();
-      currentSessionId = null;
-      startNewChat();
+    /**
+     * 清空所有历史记录
+     */
+    window.clearAllHistory = async function () {
+      if (!confirm("确定要清空所有历史记录吗？此操作不可撤销！")) return;
+
+      try {
+        // 从后端删除所有历史记录
+        const response = await fetch(
+          `${API_URL}/users/${currentUser.uid}/history`,
+          {
+            method: "DELETE",
+            credentials: "same-origin",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        // 清空本地缓存
+        chatHistory = {};
+        currentSessionId = null;
+
+        // 创建新会话
+        startNewChat();
+
+        console.log("所有历史记录已清空");
+      } catch (error) {
+        console.error("清空历史记录失败:", error);
+        alert("清空历史记录失败，请重试");
+      }
     };
 
+    /**
+     * 导出所有历史记录
+     */
     window.exportAllHistory = function () {
-      const dataStr = JSON.stringify(chatHistory, null, 2);
-      const blob = new Blob([dataStr], { type: "application/json" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `ai_chat_history_${Date.now()}.json`;
-      a.click();
-      URL.revokeObjectURL(a.href);
+      try {
+        // 将对象格式的历史记录转换为更友好的导出格式
+        const exportData = {
+          user: currentUser,
+          exportTime: new Date().toISOString(),
+          sessions: Object.values(chatHistory).map((session) => ({
+            sessionId: session.id,
+            title: session.title,
+            timestamp: session.timestamp,
+            date: new Date(session.timestamp).toLocaleString("zh-CN"),
+            messages: session.messages,
+          })),
+        };
+
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const blob = new Blob([dataStr], { type: "application/json" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `ai_chat_history_${
+          currentUser.username
+        }_${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+
+        console.log("历史记录已导出");
+      } catch (error) {
+        console.error("导出历史记录失败:", error);
+        alert("导出历史记录失败，请重试");
+      }
     };
 
     // 工具函数
@@ -1308,7 +1674,10 @@
         else if (isMiniChatOpen) toggleMiniChat();
       }
     });
-    window.addEventListener("beforeunload", saveCurrentSession);
+    window.addEventListener("beforeunload", () => {
+      // 页面卸载时的清理工作，如果需要的话
+      console.log("页面即将关闭");
+    });
 
     // 绑定UI元素事件
     getEl("aiFullInput")?.addEventListener("keydown", (e) => {
@@ -1373,7 +1742,7 @@
     console.log("AI 助手插件初始化完成。");
   }
 
-  // --- 7. 启动插件 ---
+  // --- 8. 启动插件 ---
   // 等待DOM加载完毕后执行注入
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initializePlugin);
