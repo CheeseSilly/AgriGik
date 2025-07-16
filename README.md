@@ -9,4 +9,5 @@ Also,for the final defense of this "weird" project,i turn to **Prompt Engineerin
 - [IP102](https://github.com/xpwu95/IP102)
 - agriculture_wiki_qa (from Modelscope)
 
-
+## JS
+just insert `chatv2.js` into your page.and working.
