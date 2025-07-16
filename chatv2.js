@@ -1,19 +1,27 @@
 /**
  * AI Assistant Plugin v1.0
  *
- * Usage:
- * 1. Save this file as ai-plugin.js
- * 2. Add <script src="path/to/ai-plugin.js" defer></script> to the HTML page where you want to integrate it
- * 3. (Optional) Override default configuration by defining window.AI_PLUGIN_CONFIG object in the page.
+ * 使用方法:
+ * 1. 将此文件保存为 ai-plugin.js
+ * 2. 在您想集成的HTML页面中添加 <script src="path/to/ai-plugin.js" defer></script>
+ * 3. (可选) 通过在页面中定义 window.AI_PLUGIN_CONFIG 对象来覆盖默认配置。
  */
+
 (function () {
-  // --- 1. Prevent plugin from being loaded multiple times ---
+  // --- 1. 防止插件被重复加载 ---
   if (document.getElementById("aiAssistantWidgetContainer")) {
-    console.warn("AgriGik已经加载。");
+    console.warn("AgriGik already loaded.");
     return;
   }
+  // 注入 Sweetswal2
+  const swalScript = document.createElement("script");
+  swalScript.src = "/static/js/sweetalert.min.js";
+  document.head.appendChild(swalScript);
 
-  // --- 2. Default configuration ---
+  const swalScript2 = document.createElement("script");
+  swalScript2.src = "/static/js/sweetalert2.js";
+  document.head.appendChild(swalScript2);
+  // --- 2. 默认配置 ---
   const defaultConfig = {
     ollamaBaseUrl: "http://localhost:11434",
     ollamaModel: "AgriGik",
@@ -21,10 +29,11 @@
     lucideIconUrl: "https://unpkg.com/lucide@latest/dist/umd/lucide.js",
   };
 
-  // --- 3. Merge user configuration ---
+  // --- 3. 合并用户配置 ---
   const userConfig = window.AI_PLUGIN_CONFIG || {};
   const config = { ...defaultConfig, ...userConfig };
 
+  // --- 4. 定义插件的CSS样式 (来自 styles.css) ---
   // --- 4. Define plugin CSS styles (from styles.css) ---
   const widgetCSS = `
     /* CSS Variable Definitions */
@@ -293,7 +302,7 @@
     @media (max-width: 768px) { .sidebar { width: 260px; } .main-messages { padding: 20px; } }
     `;
 
-  // --- 5. Define plugin HTML structure (from chatv2.html) ---
+  // --- 5. 定义插件的HTML结构 (来自 chatv2.html) ---
   const widgetHTML = `
       <div class="ai-assistant-widget">
         <button id="aiButton" onclick="toggleMiniChat()" class="btn-floating">
@@ -391,47 +400,47 @@
       </div>
     `;
 
-  // --- 6. Inject CSS, HTML and external dependencies ---
+  // --- 6. 注入CSS, HTML和外部依赖的函数 ---
   function initializePlugin() {
-    // Inject CSS
+    // 注入CSS
     const styleElement = document.createElement("style");
     styleElement.id = "ai-assistant-plugin-styles";
     styleElement.textContent = widgetCSS;
     document.head.appendChild(styleElement);
 
-    // Inject HTML
+    // 注入HTML
     const widgetContainer = document.createElement("div");
     widgetContainer.id = "aiAssistantWidgetContainer";
     widgetContainer.innerHTML = widgetHTML;
     document.body.appendChild(widgetContainer);
 
-    // Inject Lucide icon library
+    // 注入Lucide图标库
     const lucideScript = document.createElement("script");
     lucideScript.src = config.lucideIconUrl;
     lucideScript.onload = () => {
       console.log("AI 助手: Lucide 图标库加载成功。");
-      // After dependencies are loaded, run main logic
+      // 依赖加载后, 运行主逻辑
       runAiLogic();
     };
     lucideScript.onerror = () => {
       console.error("AI 助手: Lucide 图标库加载失败，部分图标可能无法显示。");
-      // Even if icon loading fails, try to run main logic
+      // 即使图标加载失败, 也尝试运行主逻辑
       runAiLogic();
     };
     document.head.appendChild(lucideScript);
   }
 
-  // --- 7. Core JavaScript logic of the plugin ---
+  // --- 7. 插件的核心JavaScript逻辑 ---
   function runAiLogic() {
-    // Use configuration defined in step 2
+    // 使用在第2步中定义的配置
     const OLLAMA_CONFIG = {
       baseUrl: config.ollamaBaseUrl,
       model: config.ollamaModel,
     };
 
-    // --- Core Logic ---
+    // --- 核心逻辑---
 
-    // State variables
+    // 状态变量
     let isMiniChatOpen = false;
     let isFullscreenOpen = false;
     let isSidebarOpen = true;
@@ -439,12 +448,12 @@
     const API_URL = config.apiUrl;
     let currentUser = null;
     let currentSessionId = null;
-    let chatHistory = {}; // Changed to object storage, grouped by session_id
+    let chatHistory = {}; // 改为对象存储，按session_id分组
 
-    // DOM element retrieval
+    // DOM元素获取
     const getEl = (id) => document.getElementById(id);
 
-    // User management
+    // 用户管理
     /**
      * 设置当前用户
      * @param {number} uid - 用户ID
@@ -463,17 +472,17 @@
      */
     async function initializeUser() {
       try {
-        // Try to get current user info (based on session)
+        // 尝试获取当前用户信息（基于session）
         const response = await fetch(`${API_URL}/current_user`, {
           method: "GET",
-          credentials: "same-origin", // Ensure sending cookies/session
+          credentials: "same-origin", // 确保发送cookies/session
         });
 
-        // Check response status
+        // 检查响应状态
         if (!response.ok) {
           if (response.status === 401) {
             console.log("用户未登录，使用默认用户配置");
-            // User not logged in, use default user configuration
+            // 用户未登录，使用默认用户配置
             await setCurrentUser(1, 0, "访客用户");
             return;
           }
@@ -484,7 +493,7 @@
           );
         }
 
-        // Check response content type
+        // 检查响应内容类型
         const contentType = response.headers.get("content-type");
         if (!contentType || !contentType.includes("application/json")) {
           const responseText = await response.text();
@@ -495,7 +504,7 @@
         const userData = await response.json();
         console.log("用户数据:", userData);
 
-        // Validate returned data structure
+        // 验证返回的数据结构
         if (!userData || typeof userData !== "object") {
           throw new Error("服务器返回的用户数据格式不正确");
         }
@@ -504,7 +513,7 @@
           throw new Error(userData.message || "获取用户信息失败");
         }
 
-        // Use data from backend to set current user
+        // 使用从后端获取的数据设置当前用户
         await setCurrentUser(
           userData["uid"],
           userData["utype"],
@@ -518,9 +527,9 @@
         });
       } catch (error) {
         console.error("用户初始化失败:", error);
-        // If user initialization fails, use default user or prompt user to login again
+        // 如果用户初始化失败，可以使用默认用户或者提示用户重新登录
         console.warn("使用默认用户配置继续运行");
-        await setCurrentUser(1, 0, "Guest User"); // Set default user
+        await setCurrentUser(1, 0, "访客用户"); // 设置默认用户
       }
     }
 
@@ -533,9 +542,9 @@
      */
     async function loadUserChatHistory() {
       if (!currentUser || !currentUser.uid) {
-        console.log("No valid user, cannot load history.");
+        console.log("无有效用户，无法加载历史记录。");
         chatHistory = {};
-        loadChatHistory(); // Render empty list
+        loadChatHistory(); // 渲染空列表
         return;
       }
 
@@ -543,7 +552,7 @@
         const response = await fetch(
           `${API_URL}/users/${currentUser.uid}/history`,
           {
-            credentials: "same-origin", // Ensure sending session info
+            credentials: "same-origin", // 确保发送session信息
           }
         );
         if (!response.ok) {
@@ -551,7 +560,7 @@
         }
         const messages = await response.json();
 
-        // Process flat message list into grouped structure by session_id
+        // 将扁平的消息列表处理成按 session_id 分组的结构
         const historyGroups = {};
         for (const msg of messages) {
           const session_id = msg.session_id;
@@ -564,12 +573,12 @@
             };
           }
 
-          // Parse message content
+          // 解析消息内容
           let messageData;
           try {
             messageData = JSON.parse(msg.message);
           } catch (e) {
-            // If parsing fails, create basic message structure
+            // 如果解析失败，创建一个基本的消息结构
             messageData = {
               role: "user",
               content: msg.message,
@@ -579,13 +588,13 @@
 
           historyGroups[session_id].messages.push(messageData);
 
-          // Update session title and timestamp
+          // 更新会话的标题和时间戳
           const msgTimestamp = new Date(msg.created_at).getTime();
           if (msgTimestamp > historyGroups[session_id].timestamp) {
             historyGroups[session_id].timestamp = msgTimestamp;
           }
 
-          // Use first user message as title
+          // 使用第一个用户消息作为标题
           if (
             historyGroups[session_id].title === "新对话" &&
             messageData.role === "user"
@@ -596,9 +605,9 @@
         }
 
         chatHistory = historyGroups;
-        loadChatHistory(); // Render sidebar with processed data
+        loadChatHistory(); // 使用处理好的数据渲染侧边栏
 
-        // Auto-load the latest session
+        // 自动加载最新的会话
         const sessionIds = Object.keys(chatHistory);
         if (sessionIds.length > 0) {
           const latestSessionId = sessionIds.sort(
@@ -609,15 +618,15 @@
           startNewChat();
         }
       } catch (error) {
-        console.error("Failed to load user history:", error);
+        console.error("加载用户历史记录失败:", error);
         chatHistory = {};
-        loadChatHistory(); // Render empty list
+        loadChatHistory(); // 渲染空列表
       }
     }
 
     /**
-     * Save a single message to backend database
-     * @param {object} messageObject - Message object, e.g. { role: 'user', content: 'Hello', timestamp: 1234567890 }
+     * 将单条消息保存到后端数据库
+     * @param {object} messageObject - 消息对象，例如 { role: 'user', content: '你好', timestamp: 1234567890 }
      */
     async function saveMessageToBackend(messageObject) {
       console.log(currentUser, currentUser.uid, currentSessionId);
@@ -635,7 +644,7 @@
             credentials: "same-origin",
             body: JSON.stringify({
               session_id: currentSessionId,
-              message: JSON.stringify(messageObject), // Convert message object to JSON string for storage
+              message: JSON.stringify(messageObject), // 将消息对象转为JSON字符串存储
             }),
           }
         );
@@ -647,10 +656,10 @@
         const savedMessage = await response.json();
         console.log("消息已保存到后端:", savedMessage);
 
-        // Immediately update local history
+        // 立即更新本地历史记录
         updateLocalChatHistory(messageObject);
 
-        // Update history display
+        // 更新历史记录显示
         updateHistoryDisplay();
       } catch (error) {
         console.error("保存消息到后端失败:", error);
@@ -664,7 +673,7 @@
     function updateLocalChatHistory(messageObject) {
       if (!currentSessionId) return;
 
-      // If current session doesn't exist in history, create it
+      // 如果当前会话在历史记录中不存在，创建它
       if (!chatHistory[currentSessionId]) {
         chatHistory[currentSessionId] = {
           id: currentSessionId,
@@ -674,13 +683,13 @@
         };
       }
 
-      // Add message to current session
+      // 添加消息到当前会话
       chatHistory[currentSessionId].messages.push(messageObject);
 
-      // Update session timestamp
+      // 更新会话的时间戳
       chatHistory[currentSessionId].timestamp = messageObject.timestamp;
 
-      // If it's a user message and current session title is still default, update title
+      // 如果是用户消息且当前会话标题还是默认的，更新标题
       if (
         messageObject.role === "user" &&
         chatHistory[currentSessionId].title === "新对话"
@@ -694,14 +703,14 @@
      * 更新历史记录显示
      */
     function updateHistoryDisplay() {
-      // Only update history display in fullscreen mode
+      // 只在全屏模式下更新历史记录显示
       if (isFullscreenOpen) {
         loadChatHistory();
         updateHistorySelection(currentSessionId);
       }
     }
 
-    // Theme toggle
+    // 主题切换
     function initializeTheme() {
       const savedTheme = localStorage.getItem("theme") || "light";
       if (savedTheme === "dark") {
@@ -711,7 +720,7 @@
       }
     }
 
-    // UI toggle
+    // UI 切换
     window.toggleMiniChat = function () {
       isMiniChatOpen = !isMiniChatOpen;
       const miniChat = getEl("aiMiniChat");
@@ -730,7 +739,7 @@
       }
     };
 
-    // Fullscreen
+    //全屏
     window.openFullscreen = function () {
       isFullscreenOpen = true;
       getEl("aiModal").classList.add("active");
@@ -752,7 +761,7 @@
       getEl("aiSidebar").classList.toggle("hidden", !isSidebarOpen);
     };
 
-    // Handle buttons
+    //处理按钮
     window.handleHeaderButtonClick = function (event, actionName) {
       event.stopPropagation();
       switch (actionName) {
@@ -768,13 +777,13 @@
       }
     };
 
-    // Message handling
+    // 消息处理
     window.sendFullMessage = async function () {
       const input = getEl("aiFullInput");
       const message = input.value.trim();
       if (!message && currentFiles.length === 0) return;
 
-      // Create file copy for sending
+      // 创建文件副本用于发送
       const filesToSend = [...currentFiles];
 
       if (message) {
@@ -793,12 +802,12 @@
         );
         hideTypingIndicator();
         addFullMessage(aiResponse, "ai");
-        // Message already saved to backend in addFullMessage
+        // 消息已经在addFullMessage中自动保存到后端
       } catch (error) {
         console.error("发送消息失败:", error);
         hideTypingIndicator();
 
-        // Provide different error messages based on error type
+        // 根据错误类型提供不同的错误信息
         let errorMessage = "抱歉，AI服务暂时不可用。";
         if (error.message.includes("无法连接到Ollama")) {
           errorMessage =
@@ -819,7 +828,7 @@
       const message = input.value.trim();
       if (!message) return;
 
-      // If no current session, create a new session
+      // 如果没有当前会话，创建一个新会话
       if (!currentSessionId) {
         currentSessionId = `session_${Date.now()}_${Math.random()
           .toString(36)
@@ -833,7 +842,7 @@
       try {
         const aiResponse = await generateAIResponse(message);
         addMiniMessage(aiResponse, "ai");
-        // Message already saved to backend in addMiniMessage
+        // 消息已经在addMiniMessage中自动保存到后端
       } catch (error) {
         console.error("发送消息失败:", error);
         let errorMessage = "抱歉，AI服务暂时不可用。";
@@ -868,7 +877,7 @@
       scrollToBottom("aiFullMessages");
       lucide.createIcons();
 
-      // Save message to backend
+      // 保存消息到后端
       const messageObject = {
         role: sender,
         content: content,
@@ -884,7 +893,7 @@
       scrollToBottom("aiMiniMessages");
       lucide.createIcons();
 
-      // Save message to backend
+      // 保存消息到后端
       const messageObject = {
         role: sender,
         content: content,
@@ -921,12 +930,12 @@
       getEl("typingIndicator")?.remove();
     }
 
-    // File handling
+    // 文件处理
     window.handleFullFileUpload = function (event) {
       const files = event.target.files;
       if (files && files.length > 0) {
         addFilesToUploadList(files);
-        // Reset file input to allow re-upload of same file
+        // 重置文件input以允许重复上传相同文件
         event.target.value = "";
       }
     };
@@ -939,7 +948,7 @@
         fileDiv.className = "file-item";
         fileDiv.setAttribute("data-filename", file.name);
 
-        // Create file info section
+        // 创建文件信息部分
         const fileInfo = document.createElement("div");
         fileInfo.className = "file-info";
         fileInfo.innerHTML = `
@@ -950,7 +959,7 @@
           <span class="file-name">${file.name}</span>
         `;
 
-        // Create delete button
+        // 创建删除按钮
         const removeBtn = document.createElement("button");
         removeBtn.className = "file-remove";
         removeBtn.title = "删除文件";
@@ -961,7 +970,7 @@
           </svg>
         `;
 
-        // Bind delete event
+        // 绑定删除事件
         removeBtn.addEventListener("click", () => {
           removeFile(removeBtn, file.name);
         });
@@ -971,16 +980,16 @@
         container.appendChild(fileDiv);
       }
 
-      // Re-initialize icons
+      // 重新初始化图标
       if (window.lucide) {
         lucide.createIcons();
       }
     }
     window.removeFile = function (button, fileName) {
-      // Remove from file array
+      // 从文件数组中移除
       currentFiles = currentFiles.filter((f) => f.name !== fileName);
 
-      // Remove file item from DOM
+      // 从DOM中移除文件项
       const fileItem = button.closest(".file-item");
       if (fileItem) {
         fileItem.remove();
@@ -996,18 +1005,18 @@
       addFullMessage(`📁 已上传文件: ${file.name}`, sender);
     }
 
-    // Session management
+    // 会话管理
     window.startNewChat = function () {
-      // Generate new session ID
+      // 生成新的会话ID
       currentSessionId = `session_${Date.now()}_${Math.random()
         .toString(36)
         .substr(2, 9)}`;
 
-      // Clear interface
+      // 清空界面
       clearUploadedFiles();
       getEl("aiFullMessages").innerHTML = getEl("exampleQuestions").outerHTML;
 
-      // Add welcome message
+      // 添加欢迎消息
       const welcomeMsg = createMessageElement(
         "👋 您好！我是谷稷，有什么农业问题可以帮助您解答？",
         "ai"
@@ -1015,7 +1024,7 @@
       getEl("aiFullMessages").prepend(welcomeMsg);
       lucide.createIcons();
 
-      // Create history entry for new session
+      // 创建新会话的历史记录条目
       if (!chatHistory[currentSessionId]) {
         chatHistory[currentSessionId] = {
           id: currentSessionId,
@@ -1124,7 +1133,6 @@
      */
     window.deleteSession = async function (sessionId) {
       if (!confirm("确定要删除这个对话吗？")) return;
-
       try {
         // 从后端删除会话
         const response = await fetch(
@@ -1188,7 +1196,7 @@
         console.log("所有历史记录已清空");
       } catch (error) {
         console.error("清空历史记录失败:", error);
-        alert("清空历史记录失败，请重试");
+        console.log("清空历史记录失败，请重试");
       }
     };
 
@@ -1223,7 +1231,7 @@
         console.log("历史记录已导出");
       } catch (error) {
         console.error("导出历史记录失败:", error);
-        alert("导出历史记录失败，请重试");
+        swal("导出历史记录失败，请重试");
       }
     };
 
@@ -1750,3 +1758,8 @@
     initializePlugin();
   }
 })();
+
+/*
+Well, going from simply making an AI assistant plugin
+to involving a full-stack application has indeed been quite an interesting journey.:)
+*/
